@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BitLife Web Edition</title>
+    <title>BitLife Web Replica</title>
     <style>
         * {
             box-sizing: border-box;
@@ -32,25 +32,26 @@
             position: relative;
             overflow: hidden;
         }
+
         /* Top Header */
         .header {
             background-color: #0a1826;
-            padding: 15px;
+            padding: 12px 15px;
             text-align: center;
             border-bottom: 2px solid #00529b;
         }
         .header h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 20px;
             color: #ffce00;
         }
         .header p {
-            margin: 5px 0 0 0;
-            font-size: 14px;
+            margin: 4px 0 0 0;
+            font-size: 13px;
             color: #9bb7d4;
         }
 
-        /* Log / Event Box */
+        /* Log Box */
         .log-box {
             flex-grow: 1;
             padding: 15px;
@@ -64,7 +65,7 @@
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 10px;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
             border-left: 3px solid #ffce00;
         }
@@ -73,11 +74,10 @@
         .nav-bar {
             display: flex;
             background-color: #00529b;
-            height: 80px;
+            height: 75px;
             align-items: center;
             position: relative;
             border-top: 1px solid #0068c4;
-            border-bottom: 1px solid #003e75;
         }
         .nav-item {
             flex: 1;
@@ -94,25 +94,22 @@
             height: 100%;
         }
         .nav-icon {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             background-color: #00bcd4;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            margin-bottom: 4px;
+            font-size: 17px;
+            margin-bottom: 3px;
             color: white;
         }
         
-        .nav-item.center {
-            position: relative;
-            z-index: 10;
-        }
+        .nav-item.center { position: relative; z-index: 10; }
         .age-btn {
-            width: 75px;
-            height: 75px;
+            width: 70px;
+            height: 70px;
             background-color: #28a745;
             border: 4px solid #ffffff;
             border-radius: 50%;
@@ -122,93 +119,120 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             cursor: pointer;
             margin-top: -15px;
         }
-        .age-btn .plus {
-            font-size: 24px;
-            line-height: 1;
-        }
+        .age-btn .plus { font-size: 22px; line-height: 1; }
 
-        /* Bottom Stats Table */
+        /* Bottom Stats Bar */
         .stats-section {
             background-color: #0a1826;
-            padding: 15px;
+            padding: 12px 15px;
             border-top: 1px solid #1a3048;
         }
-        .stat-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .stat-row:last-child {
-            margin-bottom: 0;
-        }
-        .stat-label {
-            width: 100px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #d1e2f3;
-        }
+        .stat-row { display: flex; align-items: center; margin-bottom: 6px; }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { width: 90px; font-size: 12px; font-weight: bold; color: #d1e2f3; }
         .stat-bar-bg {
             flex-grow: 1;
-            height: 12px;
+            height: 10px;
             background-color: #12283e;
-            border-radius: 6px;
+            border-radius: 5px;
             overflow: hidden;
             border: 1px solid #1a3858;
         }
-        .stat-bar-fill {
-            height: 100%;
-            background-color: #28a745;
-            width: 50%;
-            transition: width 0.3s ease;
-        }
+        .stat-bar-fill { height: 100%; background-color: #28a745; transition: width 0.3s ease; }
 
-        /* Modals (für Menüs) */
-        .modal {
+        /* Fullscreen BitLife Style View */
+        .bitlife-modal {
             display: none;
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 100;
+            background: #ffffff;
+            color: #000000;
+            z-index: 200;
             flex-direction: column;
-            padding: 20px;
         }
-        .modal-header {
+        .bitlife-header {
+            background: #00529b;
+            color: white;
+            padding: 12px 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #00529b;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            justify-content: space-between;
         }
-        .modal-title { font-size: 18px; font-weight: bold; color: #ffce00; }
-        .close-btn { background: #dc3545; border: none; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; }
-        .modal-body { overflow-y: auto; flex-grow: 1; }
-        .card {
-            background: #102538;
-            border: 1px solid #1c3c5a;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
+        .bitlife-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-        .card-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; color: #ffce00; }
-        .card-sub { font-size: 12px; color: #9bb7d4; margin-bottom: 8px; }
-        .btn-action-modal {
-            background: #28a745;
+        .bitlife-close-btn {
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            width: 100%;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
         }
-        .btn-action-modal:hover { background: #218838; }
+
+        .bitlife-menu-list { flex-grow: 1; overflow-y: auto; background: #ffffff; }
+
+        /* BitLife List Items */
+        .bitlife-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            color: #000;
+        }
+        .bitlife-item:active { background: #f1f5f9; }
+        .bitlife-item-icon { font-size: 26px; margin-right: 14px; width: 32px; text-align: center; }
+        .bitlife-item-text { flex-grow: 1; }
+        .bitlife-item-title { font-weight: 800; font-size: 15px; color: #00529b; }
+        .bitlife-item-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+        .bitlife-item-arrow { color: #00529b; font-weight: bold; font-size: 16px; }
+
+        /* Special Category Headers */
+        .bitlife-divider {
+            background: #64748b;
+            color: white;
+            padding: 5px 15px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Relationship Progress Bar */
+        .rel-bar-container {
+            width: 120px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .rel-bar-fill { height: 100%; background: #22c55e; }
+
+        /* Premium Banners */
+        .premium-item { background: #fefce8; }
+        .premium-badge {
+            background: #64748b;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -216,8 +240,8 @@
 <div class="app-container">
     <!-- Header -->
     <div class="header">
-        <h1 id="char-name">Henri</h1>
-        <p><span id="char-job">Kleinkind</span> | Bankkonto: <span id="char-money">0 €</span></p>
+        <h1 id="char-name">Sariyah Daher 🏀</h1>
+        <p><span id="char-job">Arbeitslos</span> | Bankguthaben: <span id="char-money">0 $</span></p>
     </div>
 
     <!-- Event Log -->
@@ -225,11 +249,11 @@
 
     <!-- Navigation Bar -->
     <div class="nav-bar">
-        <button class="nav-item" onclick="openJobMenu()">
+        <button class="nav-item" onclick="openView('job')">
             <div class="nav-icon">💼</div>
-            Beruf
+            Tätigkeit
         </button>
-        <button class="nav-item" onclick="openMenu('Besitz')">
+        <button class="nav-item" onclick="openView('assets')">
             <div class="nav-icon">💰</div>
             Besitz
         </button>
@@ -241,11 +265,11 @@
             </div>
         </button>
 
-        <button class="nav-item" onclick="openRelationships()">
+        <button class="nav-item" onclick="openView('relationships')">
             <div class="nav-icon">❤️</div>
             Beziehungen
         </button>
-        <button class="nav-item" onclick="openMenu('Aktivitäten')">
+        <button class="nav-item" onclick="openView('activities')">
             <div class="nav-icon">•••</div>
             Aktivitäten
         </button>
@@ -271,68 +295,44 @@
         </div>
     </div>
 
-    <!-- Modal für Beziehungen -->
-    <div id="rel-modal" class="modal">
-        <div class="modal-header">
-            <span class="modal-title">❤️ Beziehungen</span>
-            <button class="close-btn" onclick="closeModal('rel-modal')">X</button>
+    <!-- Universal BitLife Screen Overlay -->
+    <div id="bitlife-modal" class="bitlife-modal">
+        <div class="bitlife-header">
+            <button class="bitlife-close-btn" onclick="closeView()">✕</button>
+            <h2 id="bitlife-title">MENÜ</h2>
+            <div style="width:30px;"></div>
         </div>
-        <div id="rel-list" class="modal-body"></div>
-    </div>
-
-    <!-- Modal für Beruf -->
-    <div id="job-modal" class="modal">
-        <div class="modal-header">
-            <span class="modal-title">💼 Beruf & Karriere</span>
-            <button class="close-btn" onclick="closeModal('job-modal')">X</button>
-        </div>
-        <div id="job-content" class="modal-body"></div>
+        <div class="bitlife-menu-list" id="bitlife-content"></div>
     </div>
 </div>
 
 <script>
-    const femaleNames = ["Julia", "Sarah", "Laura", "Anna", "Lisa", "Lena", "Katharina"];
-    const maleNames = ["Michael", "Stefan", "Thomas", "Christian", "Lukas", "Felix", "David"];
-
     let p = {
-        name: "Henri",
-        age: 0,
+        name: "Sariyah Daher",
+        age: 14,
         money: 0,
-        status: "Kleinkind",
-        job: "Keiner",
+        status: "Schüler",
+        job: "Arbeitslos",
         salary: 0,
-        health: Math.floor(Math.random() * 70) + 30,
-        happy: Math.floor(Math.random() * 70) + 30,
-        smart: Math.floor(Math.random() * 70) + 30,
-        looks: Math.floor(Math.random() * 70) + 30,
+        health: 85,
+        happy: 70,
+        smart: 80,
+        looks: 75,
         alive: true,
-        relationships: []
+        relationships: [
+            { cat: "Eltern", name: "Yamila Daher", role: "Mutter", rel: 90, alive: true },
+            { cat: "Eltern", name: "Aladdin Antoun", role: "Stiefvater", rel: 65, alive: true },
+            { cat: "Geschwister", name: "Saladin Antoun", role: "Halb-Bruder", rel: 55, alive: true },
+            { cat: "Geschwister", name: "Borak Antoun", role: "Halb-Bruder", rel: 25, alive: true },
+            { cat: "Freunde", name: "Adham Baba", role: "Freund", rel: 10, alive: true },
+            { cat: "Verstorbene", name: "Adham Antoun", role: "Halb-Bruder", rel: 0, alive: false, note: "Vor 10 Jahren gestorben" }
+        ]
     };
 
-    function initFamily() {
-        p.relationships.push({
-            id: 1, role: "Mutter", name: femaleNames[Math.floor(Math.random() * femaleNames.length)],
-            age: Math.floor(Math.random() * 12) + 24, rel: Math.floor(Math.random() * 40) + 60, alive: true
-        });
-        p.relationships.push({
-            id: 2, role: "Vater", name: maleNames[Math.floor(Math.random() * maleNames.length)],
-            age: Math.floor(Math.random() * 15) + 26, rel: Math.floor(Math.random() * 40) + 60, alive: true
-        });
-        let sibCount = Math.floor(Math.random() * 3);
-        for(let i = 0; i < sibCount; i++) {
-            let isSister = Math.random() < 0.5;
-            p.relationships.push({
-                id: 3 + i, role: isSister ? "Schwester" : "Bruder",
-                name: isSister ? femaleNames[Math.floor(Math.random() * femaleNames.length)] : maleNames[Math.floor(Math.random() * maleNames.length)],
-                age: Math.floor(Math.random() * 5) + 1, rel: Math.floor(Math.random() * 50) + 50, alive: true
-            });
-        }
-    }
-
     function updateUI() {
-        document.getElementById('char-name').innerText = `${p.name} (Alter ${p.age})`;
-        document.getElementById('char-job').innerText = p.job !== "Keiner" ? p.job : p.status;
-        document.getElementById('char-money').innerText = p.money + " €";
+        document.getElementById('char-name').innerText = `${p.name} 🏀`;
+        document.getElementById('char-job').innerText = p.job !== "Arbeitslos" ? p.job : p.status;
+        document.getElementById('char-money').innerText = p.money + " $";
 
         document.getElementById('bar-happy').style.width = p.happy + "%";
         document.getElementById('bar-health').style.width = p.health + "%";
@@ -347,184 +347,162 @@
 
     function ageUp() {
         if (!p.alive) return;
-
         p.age++;
+        if (p.salary > 0) p.money += p.salary;
+        addLog("Ein weiteres Jahr vergeht.");
+        updateUI();
+    }
 
-        // Gehalt auszahlen
-        if (p.salary > 0) {
-            p.money += p.salary;
-            addLog(`💰 Du hast dein Jahresgehalt von ${p.salary} € erhalten.`);
-        }
+    function closeView() {
+        document.getElementById('bitlife-modal').style.display = 'none';
+    }
 
-        // Familien-Alterung
-        p.relationships.forEach(r => {
-            if (r.alive) {
-                r.age++;
-                if (r.age > 80 && Math.random() < 0.25) {
-                    r.alive = false;
-                    addLog(`🪦 Deine(e) ${r.role} ${r.name} ist im Alter von ${r.age} Jahren gestorben.`);
-                    p.happy = Math.max(0, p.happy - 30);
+    function openView(type) {
+        if (!p.alive) return;
+        const modal = document.getElementById('bitlife-modal');
+        const title = document.getElementById('bitlife-title');
+        const content = document.getElementById('bitlife-content');
+        modal.style.display = 'flex';
+
+        // 1. BEZIEHUNGEN SCREEN (Visuals Exakt wie Bild 5)
+        if (type === 'relationships') {
+            title.innerText = "BEZIEHUNGEN";
+            content.innerHTML = "";
+
+            const categories = ["Eltern", "Geschwister", "Freunde", "Verstorbene"];
+
+            categories.forEach(cat => {
+                const items = p.relationships.filter(r => r.cat === cat);
+                if (items.length > 0) {
+                    content.innerHTML += `<div class="bitlife-divider">${cat}</div>`;
+                    items.forEach(r => {
+                        if (r.alive) {
+                            content.innerHTML += `
+                                <div class="bitlife-item" onclick="interactRel('${r.name}')">
+                                    <div class="bitlife-item-icon">👤</div>
+                                    <div class="bitlife-item-text">
+                                        <div class="bitlife-item-title">${r.name} <span style="font-weight:normal; color:#64748b;">(${r.role})</span></div>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span style="font-size:12px; color:#64748b;">Beziehung</span>
+                                            <div class="rel-bar-container">
+                                                <div class="rel-bar-fill" style="width:${r.rel}%; background:${r.rel < 40 ? '#ef4444' : '#22c55e'};"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bitlife-item-arrow">❯</div>
+                                </div>
+                            `;
+                        } else {
+                            content.innerHTML += `
+                                <div class="bitlife-item" style="opacity:0.7;">
+                                    <div class="bitlife-item-icon">💀</div>
+                                    <div class="bitlife-item-text">
+                                        <div class="bitlife-item-title" style="color:#475569;">${r.name} <span style="font-weight:normal;">(${r.role})</span></div>
+                                        <div class="bitlife-item-sub">${r.note}</div>
+                                    </div>
+                                    <div class="bitlife-item-arrow">• • •</div>
+                                </div>
+                            `;
+                        }
+                    });
                 }
-            }
-        });
-
-        // Schule & Status
-        if (p.age === 6) {
-            p.status = "Grundschule";
-            addLog("🎒 Du wurdest in der Grundschule eingeschult!");
-        } else if (p.age === 10) {
-            p.status = "Sekundarschule";
-            addLog("🏫 Du bist auf die Sekundarschule gewechselt!");
-        } else if (p.age === 14) {
-            p.status = "Schulabschluss gemacht";
-            addLog("🎓 Du hast deinen Schulabschluss erreicht! Du kannst dir jetzt Jobs suchen.");
+            });
         }
 
-        let rand = Math.random();
-        if (rand < 0.2) {
-            p.happy = Math.min(100, p.happy + 8);
-            addLog("Du hattest einen wunderschönen Tag!");
-        } else if (rand < 0.35) {
-            p.health = Math.max(0, p.health - 10);
-            addLog("Du hast dich erkältet (-Gesundheit).");
+        // 2. AKTIVITÄTEN SCREEN (Exakt wie Bild 1, 2, 3, 4, 6)
+        else if (type === 'activities') {
+            title.innerText = "AKTIVITÄTEN";
+            content.innerHTML = `
+                <div class="bitlife-divider">Favoriten</div>
+                ${createActItem('❤️', 'Liebe', 'Die große Liebe suchen', 'openLove()', '❯')}
+                ${createActItem('🧘', 'Körper und Geist', 'An dir arbeiten', 'openBodyMind()', '❯')}
+                ${createActItem('🐶', 'Haustiere', 'Ein Haustier anschaffen', 'addLog("Du warst im Tierheim.")', '• • •')}
+                ${createActItem('💆', 'Salon und Spa', 'Zeit für dich selbst nehmen', 'addLog("Du warst im Spa.")', '❯')}
+
+                <div class="bitlife-divider">Premium-Aktivitäten</div>
+                ${createActItem('🧟', 'Albtraum des Grauens', 'Lebe ein besonderes Horrorszenario', '', '✦', true)}
+                ${createActItem('🌳', 'Outdoor-Lifestyle', 'Zeit mit Mutter Natur verbringen', '', '✦', true)}
+                ${createActItem('💎', 'Luxus Lifestyle', 'Vermögen aufbauen', '', '✦', true)}
+                ${createActItem('🦁', 'Zoo', 'Einen Zoo kaufen', '', '✦', true)}
+                ${createActItem('🕵️', 'Geheimagent', 'Gründe deine eigene Spionageagentur', '', '✦', true)}
+                ${createActItem('🕶️', 'Schwarzmarkt', 'Kaufe Schmuggelware', '', '✦', true)}
+                ${createActItem('🕯️', 'Kommune', 'Gründe einen Kult', '', '✦', true)}
+
+                <div class="bitlife-divider">Alle</div>
+                ${createActItem('👒', 'Accessoires', 'Lege dir coole Accessoires an', '', '❯')}
+                ${createActItem('🧸', 'Adoption', 'Ein Kind adoptieren', '', '• • •')}
+                ${createActItem('♠️', 'Casino', 'Das Casino besuchen', '', '• • •')}
+                ${createActItem('👺', 'Kriminalität', 'Ein Verbrechen begehen', '', '❯')}
+                ${createActItem('👨‍⚕️', 'Doktor', 'Zum Arzt gehen', '', '❯')}
+                ${createActItem('🌐', 'Emigrieren', 'In ein anderes Land auswandern', '', '• • •')}
+                ${createActItem('🧬', 'Fruchtbarkeit', 'Eine Fruchtbarkeitsklinik aufsuchen', '', '❯')}
+                ${createActItem('🏇', 'Pferderennen', 'Zum Pferderennen gehen', '', '• • •')}
+                ${createActItem('👤', 'Identität', 'Deine Identität definieren', '', '❯')}
+                ${createActItem('⚖️', 'Gerichtsverfahren', 'Jemanden verklagen', '', '• • •')}
+                ${createActItem('🚗', 'Lizenzen', 'Deine Führer-/Flugscheine verwalten', '', '❯')}
+                ${createActItem('💰', 'Lotterie', 'Lotto spielen', '', '• • •')}
+                ${createActItem('🎭', 'Kino', 'Ins Kino gehen', '', '❯')}
+                ${createActItem('🍸', 'Nachtleben', 'In Clubs gehen', '', '• • •')}
+                ${createActItem('✂️', 'Schönheitschirurgie', 'Einer Schönheits-OP unterziehen', '', '❯')}
+                ${createActItem('🙏', 'Beten', 'Bete zu den BitLife-Entwicklern', 'addLog("Du hast zu den Entwicklern gebetet!")', '• • •')}
+                ${createActItem('☀️', 'Entzug', 'Deine Süchte bekämpfen', '', '❯')}
+                ${createActItem('🛍️', 'Bummeln', 'Shoppen gehen', '', '• • •')}
+                ${createActItem('👥', 'Social Media', 'Deine Online-Identität verwalten', '', '❯')}
+                ${createActItem('🎁', 'Gewinnspiel', 'Beim Gewinnspiel mitmachen', '', '• • •')}
+                ${createActItem('🌪️', 'Zeitmaschine', 'In der Zeit zurückreisen', '', '• • •')}
+                ${createActItem('🌴', 'Urlaub', 'In den Urlaub fahren', '', '❯')}
+                ${createActItem('📝', 'Letzter Wille und Testament', 'Dein Erbe verwalten', '', '• • •')}
+                ${createActItem('🦓', 'Zoobesuch', 'In den Zoo gehen', '', '• • •')}
+
+                <div style="padding: 15px;">
+                    <button onclick="addLog('🏳️ Du hast dein Leben aufgegeben.'); p.alive=false; closeView(); updateUI();" style="width:100%; padding:12px; background:#00bcd4; color:white; border:none; font-weight:bold; border-radius:6px; cursor:pointer;">🏳️ Aufgeben...</button>
+                </div>
+            `;
+        }
+
+        // 3. TÄTIGKEIT SCREEN
+        else if (type === 'job') {
+            title.innerText = "TÄTIGKEIT";
+            content.innerHTML = `
+                ${createActItem('🎓', 'Bildung', 'Wieder zur Schule gehen', '', '❯')}
+                ${createActItem('🧢', 'Gelegenheitsjobs', 'Schnelles Geld machen', '', '❯')}
+                ${createActItem('📞', 'Personalvermittler', 'Arbeitsvermittlung aufsuchen', '', '• • •')}
+                ${createActItem('💵', 'Jobs', 'Vollzeitjobs durchsuchen', '', '❯')}
+                ${createActItem('🛡️', 'Militär', 'Dem Militär beitreten', '', '❯')}
+                ${createActItem('🕒', 'Teilzeitjobs', 'Teilzeitjobs durchsuchen', '', '❯')}
+                ${createActItem('🎩', 'Besondere Karrieren', 'Spezielle Laufbahn einschlagen', '', '❯')}
+                <div class="bitlife-divider">Sonstiges</div>
+                ${createActItem('📓', 'Sporthistorie', 'Keine aktuelle Sporthistorie', '', '')}
+            `;
         } else {
-            addLog("Ein ganz normales Jahr vergeht.");
+            closeView();
         }
-
-        if (p.health <= 0) {
-            p.alive = false;
-            addLog("🪦 Du bist leider gestorben.");
-        }
-
-        updateUI();
     }
 
-    // Berufssystem Logik
-    function openJobMenu() {
-        if (!p.alive) return;
-        if (p.age < 14) {
-            addLog("🔒 Du bist noch zu jung zum Arbeiten! Der Bereich 'Beruf' schaltet sich erst ab 14 Jahren frei.");
-            return;
-        }
-
-        const content = document.getElementById('job-content');
-        content.innerHTML = "";
-
-        if (p.job !== "Keiner") {
-            content.innerHTML += `
-                <div class="card">
-                    <div class="card-title">Aktueller Job: ${p.job}</div>
-                    <div class="card-sub">Gehalt: ${p.salary} € / Jahr</div>
-                    <button class="btn-action-modal" style="background:#dc3545;" onclick="quitJob()">Kündigen</button>
+    function createActItem(icon, title, sub, action, arrow, isPremium = false) {
+        return `
+            <div class="bitlife-item ${isPremium ? 'premium-item' : ''}" onclick="${action}">
+                <div class="bitlife-item-icon">${icon}</div>
+                <div class="bitlife-item-text">
+                    <div class="bitlife-item-title">${title}</div>
+                    <div class="bitlife-item-sub">${sub}</div>
                 </div>
-            `;
-        }
-
-        content.innerHTML += `<div style="margin: 10px 0; font-weight:bold; color:#ffce00;">Verfügbare Vollzeit- & Teilzeitjobs:</div>`;
-
-        const availableJobs = [
-            { title: "Supermarkt-Aushilfe", minAge: 14, minSmart: 0, salary: 12000 },
-            { title: "Kellner", minAge: 16, minSmart: 20, salary: 22000 },
-            { title: "Junior Softwareentwickler", minAge: 18, minSmart: 60, salary: 48000 },
-            { title: "Arzt", minAge: 24, minSmart: 85, salary: 110000 }
-        ];
-
-        availableJobs.forEach(j => {
-            if (p.age >= j.minAge) {
-                content.innerHTML += `
-                    <div class="card">
-                        <div class="card-title">${j.title}</div>
-                        <div class="card-sub">Gehalt: ${j.salary} €/Jahr | Min. Intelligenz: ${j.minSmart}%</div>
-                        <button class="btn-action-modal" onclick="takeJob('${j.title}', ${j.salary}, ${j.minSmart})">Annehmen</button>
-                    </div>
-                `;
-            } else {
-                content.innerHTML += `
-                    <div class="card" style="opacity: 0.5;">
-                        <div class="card-title">${j.title} (Gesperrt)</div>
-                        <div class="card-sub">Erfordert Alter: ${j.minAge} Jahre</div>
-                    </div>
-                `;
-            }
-        });
-
-        document.getElementById('job-modal').style.display = 'flex';
+                <div class="bitlife-item-arrow">${arrow}</div>
+            </div>
+        `;
     }
 
-    function takeJob(title, salary, minSmart) {
-        if (p.smart < minSmart) {
-            addLog(`❌ Deine Intelligenz ist zu niedrig für den Job als ${title}!`);
-            closeModal('job-modal');
-            return;
-        }
-        p.job = title;
-        p.salary = salary;
-        addLog(`🎉 Du wurdest als ${title} eingestellt!`);
-        closeModal('job-modal');
-        updateUI();
-    }
-
-    function quitJob() {
-        addLog(`Du hast deinen Job als ${p.job} gekündigt.`);
-        p.job = "Keiner";
-        p.salary = 0;
-        closeModal('job-modal');
-        updateUI();
-    }
-
-    function openRelationships() {
-        if (!p.alive) return;
-        const list = document.getElementById('rel-list');
-        list.innerHTML = "";
-        p.relationships.filter(r => r.alive).forEach(r => {
-            list.innerHTML += `
-                <div class="card">
-                    <div class="card-title">${r.role}: ${r.name} (${r.age} Jahre)</div>
-                    <div class="stat-row" style="margin-top:5px;">
-                        <span class="stat-label">Beziehung:</span>
-                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${r.rel}%"></div></div>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;">
-                        <button class="btn-action-modal" onclick="interactRel(${r.id}, 'spend')">Zeit verbringen</button>
-                        <button class="btn-action-modal" onclick="interactRel(${r.id}, 'gift')">Geschenk (10€)</button>
-                    </div>
-                </div>
-            `;
-        });
-        document.getElementById('rel-modal').style.display = 'flex';
-    }
-
-    function interactRel(id, type) {
-        let r = p.relationships.find(item => item.id === id);
-        if (!r) return;
-        if (type === 'spend') {
+    function interactRel(name) {
+        let r = p.relationships.find(item => item.name === name);
+        if (r) {
             r.rel = Math.min(100, r.rel + 10);
             p.happy = Math.min(100, p.happy + 5);
-            addLog(`Du hast tolle Zeit mit deine(r/m) ${r.role} ${r.name} verbracht.`);
-        } else if (type === 'gift') {
-            if (p.money >= 10) {
-                p.money -= 10;
-                r.rel = Math.min(100, r.rel + 20);
-                addLog(`Du hast ${r.name} ein Geschenk gemacht!`);
-            } else {
-                addLog("Du hast nicht genug Geld für ein Geschenk!");
-            }
+            addLog(`Du hast Zeit mit ${r.name} verbracht.`);
+            openView('relationships');
+            updateUI();
         }
-        updateUI();
-        openRelationships();
     }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    function openMenu(menuName) {
-        if (!p.alive) return;
-        addLog(`Menü "${menuName}" wurde geöffnet.`);
-    }
-
-    initFamily();
-    addLog("Du wurdest geboren!");
     updateUI();
 </script>
 
