@@ -167,7 +167,7 @@
             transition: width 0.3s ease;
         }
 
-        /* Modal Overlay für Beziehungsmenü */
+        /* Modals (für Menüs) */
         .modal {
             display: none;
             position: absolute;
@@ -187,26 +187,28 @@
         }
         .modal-title { font-size: 18px; font-weight: bold; color: #ffce00; }
         .close-btn { background: #dc3545; border: none; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; }
-        .rel-list { overflow-y: auto; flex-grow: 1; }
-        .rel-card {
+        .modal-body { overflow-y: auto; flex-grow: 1; }
+        .card {
             background: #102538;
             border: 1px solid #1c3c5a;
             border-radius: 10px;
             padding: 12px;
             margin-bottom: 10px;
         }
-        .rel-info { font-weight: bold; font-size: 15px; margin-bottom: 5px; }
-        .rel-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
-        .btn-rel-action {
-            background: #00529b;
+        .card-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; color: #ffce00; }
+        .card-sub { font-size: 12px; color: #9bb7d4; margin-bottom: 8px; }
+        .btn-action-modal {
+            background: #28a745;
             border: none;
             color: white;
-            padding: 6px;
+            padding: 8px 12px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
+            width: 100%;
+            font-weight: bold;
         }
-        .btn-rel-action:hover { background: #0068c4; }
+        .btn-action-modal:hover { background: #218838; }
     </style>
 </head>
 <body>
@@ -223,7 +225,7 @@
 
     <!-- Navigation Bar -->
     <div class="nav-bar">
-        <button class="nav-item" onclick="openMenu('Beruf')">
+        <button class="nav-item" onclick="openJobMenu()">
             <div class="nav-icon">💼</div>
             Beruf
         </button>
@@ -273,9 +275,18 @@
     <div id="rel-modal" class="modal">
         <div class="modal-header">
             <span class="modal-title">❤️ Beziehungen</span>
-            <button class="close-btn" onclick="closeRelationships()">X</button>
+            <button class="close-btn" onclick="closeModal('rel-modal')">X</button>
         </div>
-        <div id="rel-list" class="rel-list"></div>
+        <div id="rel-list" class="modal-body"></div>
+    </div>
+
+    <!-- Modal für Beruf -->
+    <div id="job-modal" class="modal">
+        <div class="modal-header">
+            <span class="modal-title">💼 Beruf & Karriere</span>
+            <button class="close-btn" onclick="closeModal('job-modal')">X</button>
+        </div>
+        <div id="job-content" class="modal-body"></div>
     </div>
 </div>
 
@@ -288,6 +299,8 @@
         age: 0,
         money: 0,
         status: "Kleinkind",
+        job: "Keiner",
+        salary: 0,
         health: Math.floor(Math.random() * 70) + 30,
         happy: Math.floor(Math.random() * 70) + 30,
         smart: Math.floor(Math.random() * 70) + 30,
@@ -297,44 +310,28 @@
     };
 
     function initFamily() {
-        // Mutter
         p.relationships.push({
-            id: 1,
-            role: "Mutter",
-            name: femaleNames[Math.floor(Math.random() * femaleNames.length)],
-            age: Math.floor(Math.random() * 12) + 24,
-            rel: Math.floor(Math.random() * 40) + 60,
-            alive: true
+            id: 1, role: "Mutter", name: femaleNames[Math.floor(Math.random() * femaleNames.length)],
+            age: Math.floor(Math.random() * 12) + 24, rel: Math.floor(Math.random() * 40) + 60, alive: true
         });
-
-        // Vater
         p.relationships.push({
-            id: 2,
-            role: "Vater",
-            name: maleNames[Math.floor(Math.random() * maleNames.length)],
-            age: Math.floor(Math.random() * 15) + 26,
-            rel: Math.floor(Math.random() * 40) + 60,
-            alive: true
+            id: 2, role: "Vater", name: maleNames[Math.floor(Math.random() * maleNames.length)],
+            age: Math.floor(Math.random() * 15) + 26, rel: Math.floor(Math.random() * 40) + 60, alive: true
         });
-
-        // Zufall: 0 bis 2 Geschwister
         let sibCount = Math.floor(Math.random() * 3);
         for(let i = 0; i < sibCount; i++) {
             let isSister = Math.random() < 0.5;
             p.relationships.push({
-                id: 3 + i,
-                role: isSister ? "Schwester" : "Bruder",
+                id: 3 + i, role: isSister ? "Schwester" : "Bruder",
                 name: isSister ? femaleNames[Math.floor(Math.random() * femaleNames.length)] : maleNames[Math.floor(Math.random() * maleNames.length)],
-                age: Math.floor(Math.random() * 5) + 1,
-                rel: Math.floor(Math.random() * 50) + 50,
-                alive: true
+                age: Math.floor(Math.random() * 5) + 1, rel: Math.floor(Math.random() * 50) + 50, alive: true
             });
         }
     }
 
     function updateUI() {
         document.getElementById('char-name').innerText = `${p.name} (Alter ${p.age})`;
-        document.getElementById('char-job').innerText = p.status;
+        document.getElementById('char-job').innerText = p.job !== "Keiner" ? p.job : p.status;
         document.getElementById('char-money').innerText = p.money + " €";
 
         document.getElementById('bar-happy').style.width = p.happy + "%";
@@ -353,7 +350,13 @@
 
         p.age++;
 
-        // Alterung der Familie
+        // Gehalt auszahlen
+        if (p.salary > 0) {
+            p.money += p.salary;
+            addLog(`💰 Du hast dein Jahresgehalt von ${p.salary} € erhalten.`);
+        }
+
+        // Familien-Alterung
         p.relationships.forEach(r => {
             if (r.alive) {
                 r.age++;
@@ -365,7 +368,7 @@
             }
         });
 
-        // Schulsystem
+        // Schule & Status
         if (p.age === 6) {
             p.status = "Grundschule";
             addLog("🎒 Du wurdest in der Grundschule eingeschult!");
@@ -373,18 +376,17 @@
             p.status = "Sekundarschule";
             addLog("🏫 Du bist auf die Sekundarschule gewechselt!");
         } else if (p.age === 14) {
-            p.status = "Arbeitslos";
-            addLog("🎓 Du hast deinen Schulabschluss gemacht!");
+            p.status = "Schulabschluss gemacht";
+            addLog("🎓 Du hast deinen Schulabschluss erreicht! Du kannst dir jetzt Jobs suchen.");
         }
 
-        // Zufallsevent
         let rand = Math.random();
         if (rand < 0.2) {
             p.happy = Math.min(100, p.happy + 8);
             addLog("Du hattest einen wunderschönen Tag!");
         } else if (rand < 0.35) {
             p.health = Math.max(0, p.health - 10);
-            addLog("Du hast dich krank gefühlt (-Gesundheit).");
+            addLog("Du hast dich erkältet (-Gesundheit).");
         } else {
             addLog("Ein ganz normales Jahr vergeht.");
         }
@@ -397,87 +399,130 @@
         updateUI();
     }
 
+    // Berufssystem Logik
+    function openJobMenu() {
+        if (!p.alive) return;
+        if (p.age < 14) {
+            addLog("🔒 Du bist noch zu jung zum Arbeiten! Der Bereich 'Beruf' schaltet sich erst ab 14 Jahren frei.");
+            return;
+        }
+
+        const content = document.getElementById('job-content');
+        content.innerHTML = "";
+
+        if (p.job !== "Keiner") {
+            content.innerHTML += `
+                <div class="card">
+                    <div class="card-title">Aktueller Job: ${p.job}</div>
+                    <div class="card-sub">Gehalt: ${p.salary} € / Jahr</div>
+                    <button class="btn-action-modal" style="background:#dc3545;" onclick="quitJob()">Kündigen</button>
+                </div>
+            `;
+        }
+
+        content.innerHTML += `<div style="margin: 10px 0; font-weight:bold; color:#ffce00;">Verfügbare Vollzeit- & Teilzeitjobs:</div>`;
+
+        const availableJobs = [
+            { title: "Supermarkt-Aushilfe", minAge: 14, minSmart: 0, salary: 12000 },
+            { title: "Kellner", minAge: 16, minSmart: 20, salary: 22000 },
+            { title: "Junior Softwareentwickler", minAge: 18, minSmart: 60, salary: 48000 },
+            { title: "Arzt", minAge: 24, minSmart: 85, salary: 110000 }
+        ];
+
+        availableJobs.forEach(j => {
+            if (p.age >= j.minAge) {
+                content.innerHTML += `
+                    <div class="card">
+                        <div class="card-title">${j.title}</div>
+                        <div class="card-sub">Gehalt: ${j.salary} €/Jahr | Min. Intelligenz: ${j.minSmart}%</div>
+                        <button class="btn-action-modal" onclick="takeJob('${j.title}', ${j.salary}, ${j.minSmart})">Annehmen</button>
+                    </div>
+                `;
+            } else {
+                content.innerHTML += `
+                    <div class="card" style="opacity: 0.5;">
+                        <div class="card-title">${j.title} (Gesperrt)</div>
+                        <div class="card-sub">Erfordert Alter: ${j.minAge} Jahre</div>
+                    </div>
+                `;
+            }
+        });
+
+        document.getElementById('job-modal').style.display = 'flex';
+    }
+
+    function takeJob(title, salary, minSmart) {
+        if (p.smart < minSmart) {
+            addLog(`❌ Deine Intelligenz ist zu niedrig für den Job als ${title}!`);
+            closeModal('job-modal');
+            return;
+        }
+        p.job = title;
+        p.salary = salary;
+        addLog(`🎉 Du wurdest als ${title} eingestellt!`);
+        closeModal('job-modal');
+        updateUI();
+    }
+
+    function quitJob() {
+        addLog(`Du hast deinen Job als ${p.job} gekündigt.`);
+        p.job = "Keiner";
+        p.salary = 0;
+        closeModal('job-modal');
+        updateUI();
+    }
+
     function openRelationships() {
         if (!p.alive) return;
-        renderRelList();
-        document.getElementById('rel-modal').style.display = 'flex';
-    }
-
-    function closeRelationships() {
-        document.getElementById('rel-modal').style.display = 'none';
-    }
-
-    function renderRelList() {
         const list = document.getElementById('rel-list');
         list.innerHTML = "";
-
         p.relationships.filter(r => r.alive).forEach(r => {
             list.innerHTML += `
-                <div class="rel-card">
-                    <div class="rel-info">${r.role}: ${r.name} (${r.age} Jahre)</div>
-                    <div class="stat-row">
+                <div class="card">
+                    <div class="card-title">${r.role}: ${r.name} (${r.age} Jahre)</div>
+                    <div class="stat-row" style="margin-top:5px;">
                         <span class="stat-label">Beziehung:</span>
                         <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${r.rel}%"></div></div>
                     </div>
-                    <div class="rel-actions">
-                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'spend')">Zeit verbringen</button>
-                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'talk')">Unterhalten</button>
-                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'gift')">Geschenk (10€)</button>
-                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'insult')">Beleidigen</button>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;">
+                        <button class="btn-action-modal" onclick="interactRel(${r.id}, 'spend')">Zeit verbringen</button>
+                        <button class="btn-action-modal" onclick="interactRel(${r.id}, 'gift')">Geschenk (10€)</button>
                     </div>
                 </div>
             `;
         });
+        document.getElementById('rel-modal').style.display = 'flex';
     }
 
     function interactRel(id, type) {
         let r = p.relationships.find(item => item.id === id);
         if (!r) return;
-
         if (type === 'spend') {
             r.rel = Math.min(100, r.rel + 10);
             p.happy = Math.min(100, p.happy + 5);
             addLog(`Du hast tolle Zeit mit deine(r/m) ${r.role} ${r.name} verbracht.`);
-        } else if (type === 'talk') {
-            if (Math.random() < 0.7) {
-                r.rel = Math.min(100, r.rel + 5);
-                addLog(`Du hattest ein schönes Gespräch mit ${r.name}.`);
-            } else {
-                r.rel = Math.max(0, r.rel - 8);
-                addLog(`Ihr hattet eine Meinungsverschiedenheit.`);
-            }
         } else if (type === 'gift') {
             if (p.money >= 10) {
                 p.money -= 10;
                 r.rel = Math.min(100, r.rel + 20);
-                addLog(`Du hast ${r.name} ein Geschenk gemacht! (+Beziehung)`);
+                addLog(`Du hast ${r.name} ein Geschenk gemacht!`);
             } else {
                 addLog("Du hast nicht genug Geld für ein Geschenk!");
             }
-        } else if (type === 'insult') {
-            r.rel = Math.max(0, r.rel - 25);
-            p.happy = Math.max(0, p.happy - 5);
-            addLog(`Du hast ${r.name} beleidigt! (-Beziehung)`);
         }
-
         updateUI();
-        renderRelList();
+        openRelationships();
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
     }
 
     function openMenu(menuName) {
         if (!p.alive) return;
-        if (menuName === 'Beruf') {
-            if (p.age < 14) {
-                addLog("🔒 Du bist noch zu jung zum Arbeiten! Der Bereich 'Beruf' schaltet sich erst ab 14 Jahren frei.");
-            } else {
-                addLog("💼 Jobbörse geöffnet.");
-            }
-        } else {
-            addLog(`Menü "${menuName}" wurde geöffnet.`);
-        }
+        addLog(`Menü "${menuName}" wurde geöffnet.`);
     }
 
-    // Starten
     initFamily();
     addLog("Du wurdest geboren!");
     updateUI();
