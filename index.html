@@ -69,7 +69,7 @@
             border-left: 3px solid #ffce00;
         }
 
-        /* Middle Navigation Bar (aus dem Screenshot) */
+        /* Middle Navigation Bar */
         .nav-bar {
             display: flex;
             background-color: #00529b;
@@ -175,13 +175,13 @@
     <!-- Header -->
     <div class="header">
         <h1 id="char-name">Henri</h1>
-        <p><span id="char-job">Kind</span> | Bankkonto: <span id="char-money">0 €</span></p>
+        <p><span id="char-job">Kleinkind</span> | Bankkonto: <span id="char-money">0 €</span></p>
     </div>
 
     <!-- Event Log -->
     <div class="log-box" id="log-box"></div>
 
-    <!-- BitLife Navigation Bar (Bildnachbau) -->
+    <!-- BitLife Navigation Bar -->
     <div class="nav-bar">
         <button class="nav-item" onclick="openMenu('Beruf')">
             <div class="nav-icon">💼</div>
@@ -232,21 +232,22 @@
 </div>
 
 <script>
+    // Komplett zufällige Startwerte bei der Geburt (zwischen 15% und 100%)
     let p = {
         name: "Henri",
         age: 0,
         money: 0,
-        job: "Kind",
-        health: 100,
-        happy: 100,
-        smart: Math.floor(Math.random() * 40) + 50,
-        looks: Math.floor(Math.random() * 40) + 50,
+        status: "Kleinkind",
+        health: Math.floor(Math.random() * 85) + 15,
+        happy: Math.floor(Math.random() * 85) + 15,
+        smart: Math.floor(Math.random() * 85) + 15,
+        looks: Math.floor(Math.random() * 85) + 15,
         alive: true
     };
 
     function updateUI() {
         document.getElementById('char-name').innerText = `${p.name} (Alter ${p.age})`;
-        document.getElementById('char-job').innerText = p.job;
+        document.getElementById('char-job').innerText = p.status;
         document.getElementById('char-money').innerText = p.money + " €";
 
         // Fortschrittsbalken unten aktualisieren
@@ -266,19 +267,26 @@
 
         p.age++;
 
+        // Schul- & Alterssystem wie in BitLife
         if (p.age === 6) {
-            p.job = "Schüler";
-            addLog("🎓 Du wurdest in die Schule eingeschult!");
+            p.status = "Grundschule";
+            addLog("🎒 Du wurdest in der Grundschule eingeschult!");
+        } else if (p.age === 10) {
+            p.status = "Sekundarschule";
+            addLog("🏫 Du bist auf die Sekundarschule gewechselt!");
+        } else if (p.age === 14) {
+            p.status = "Arbeitslos";
+            addLog("🎓 Du hast deinen ersten Schulabschluss gemacht! Du kannst jetzt arbeiten gehen oder eine weiterführende Schule besuchen.");
         }
 
-        // Zufallsereignisse
+        // Zufallsereignisse während des Älterwerdens
         let rand = Math.random();
         if (rand < 0.2) {
-            p.happy = Math.min(100, p.happy + 10);
-            addLog("Du hast einen tollen Tag draußen verbracht!");
+            p.happy = Math.min(100, p.happy + 8);
+            addLog("Du hast einen tollen Tag mit Freunden verbracht!");
         } else if (rand < 0.35) {
-            p.health = Math.max(0, p.health - 15);
-            addLog("Du bist krank geworden (-Gesundheit).");
+            p.health = Math.max(0, p.health - 10);
+            addLog("Du hast dich erkältet (-Gesundheit).");
         } else {
             addLog("Ein ganz normales Jahr vergeht.");
         }
@@ -294,12 +302,12 @@
     function openMenu(menuName) {
         if (!p.alive) return;
 
-        if (menuName === 'Aktivitäten') {
-            // Beispiel-Aktion im Aktivitätenmenü
-            p.smart = Math.min(100, p.smart + 5);
-            p.health = Math.min(100, p.health + 3);
-            addLog("Du hast gelernt und Sport gemacht! (+Intelligenz, +Gesundheit)");
-            updateUI();
+        if (menuName === 'Beruf') {
+            if (p.age < 14) {
+                addLog("🔒 Du bist noch zu jung zum Arbeiten! Der Bereich 'Beruf' schaltet sich erst ab 14 Jahren frei.");
+            } else {
+                addLog("💼 Jobbörse geöffnet: Du kannst jetzt nach Nebenjobs oder Vollzeitjobs suchen!");
+            }
         } else {
             addLog(`Menü "${menuName}" wurde geöffnet.`);
         }
