@@ -2,99 +2,232 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BitLife Web Edition</title>
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
+            background-color: #0b1928;
             color: #ffffff;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
-            padding: 20px;
-            margin: 0;
+            align-items: center;
+            min-height: 100vh;
         }
         .app-container {
             width: 100%;
             max-width: 450px;
-            background-color: #1e1e1e;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            height: 100vh;
+            max-height: 850px;
+            background-color: #0f2337;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
         }
-        h1 { text-align: center; color: #ffce00; margin-top: 0; margin-bottom: 10px; }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            background: #2a2a2a;
+        /* Top Header */
+        .header {
+            background-color: #0a1826;
             padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #00529b;
         }
-        .stat-item { font-size: 14px; }
-        .stat-value { font-weight: bold; color: #ffce00; }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #ffce00;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #9bb7d4;
+        }
+
+        /* Log / Event Box */
         .log-box {
-            height: 250px;
-            background: #181818;
-            border-radius: 12px;
-            padding: 10px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            font-size: 14px;
-            border: 1px solid #333;
-        }
-        .log-entry { margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #282828; }
-        .btn-main {
-            width: 100%;
+            flex-grow: 1;
             padding: 15px;
-            background: #ffce00;
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 10px;
+            overflow-y: auto;
+            background: #0f2337;
+            display: flex;
+            flex-direction: column-reverse;
         }
-        .btn-main:hover { background: #e6b800; }
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-action {
-            padding: 12px;
-            background: #333;
-            color: #fff;
-            border: none;
+        .log-entry {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
             border-radius: 8px;
-            cursor: pointer;
+            margin-bottom: 10px;
             font-size: 14px;
+            line-height: 1.4;
+            border-left: 3px solid #ffce00;
         }
-        .btn-action:hover { background: #444; }
+
+        /* Middle Navigation Bar (aus dem Screenshot) */
+        .nav-bar {
+            display: flex;
+            background-color: #00529b;
+            height: 80px;
+            align-items: center;
+            position: relative;
+            border-top: 1px solid #0068c4;
+            border-bottom: 1px solid #003e75;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            height: 100%;
+        }
+        .nav-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #00bcd4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 4px;
+            color: white;
+        }
+        
+        /* Der große grüne Alter-Button */
+        .nav-item.center {
+            position: relative;
+            z-index: 10;
+        }
+        .age-btn {
+            width: 75px;
+            height: 75px;
+            background-color: #28a745;
+            border: 4px solid #ffffff;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            margin-top: -15px;
+        }
+        .age-btn .plus {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        /* Bottom Stats Table */
+        .stats-section {
+            background-color: #0a1826;
+            padding: 15px;
+            border-top: 1px solid #1a3048;
+        }
+        .stat-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+        .stat-label {
+            width: 100px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #d1e2f3;
+        }
+        .stat-bar-bg {
+            flex-grow: 1;
+            height: 12px;
+            background-color: #12283e;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #1a3858;
+        }
+        .stat-bar-fill {
+            height: 100%;
+            background-color: #28a745;
+            width: 50%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h1>BitLife Web</h1>
-    
-    <div class="stats-grid">
-        <div class="stat-item">Name: <span id="char-name" class="stat-value">-</span></div>
-        <div class="stat-item">Alter: <span id="char-age" class="stat-value">0</span></div>
-        <div class="stat-item">Geld: <span id="char-money" class="stat-value">0 €</span></div>
-        <div class="stat-item">Beruf: <span id="char-job" class="stat-value">Keiner</span></div>
-        <div class="stat-item">Gesundheit: <span id="char-health" class="stat-value">100%</span></div>
-        <div class="stat-item">Glück: <span id="char-happy" class="stat-value">100%</span></div>
-        <div class="stat-item">Intelligenz: <span id="char-smart" class="stat-value">50%</span></div>
-        <div class="stat-item">Aussehen: <span id="char-looks" class="stat-value">50%</span></div>
+    <!-- Header -->
+    <div class="header">
+        <h1 id="char-name">Henri</h1>
+        <p><span id="char-job">Kind</span> | Bankkonto: <span id="char-money">0 €</span></p>
     </div>
 
+    <!-- Event Log -->
     <div class="log-box" id="log-box"></div>
 
-    <button class="btn-main" onclick="ageUp()">+ 1 Jahr älter werden</button>
+    <!-- BitLife Navigation Bar (Bildnachbau) -->
+    <div class="nav-bar">
+        <button class="nav-item" onclick="openMenu('Beruf')">
+            <div class="nav-icon">💼</div>
+            Beruf
+        </button>
+        <button class="nav-item" onclick="openMenu('Besitz')">
+            <div class="nav-icon">💰</div>
+            Besitz
+        </button>
+        
+        <!-- Mittlerer großer Button -->
+        <button class="nav-item center" onclick="ageUp()">
+            <div class="age-btn">
+                <span class="plus">+</span>
+                <span>Alter</span>
+            </div>
+        </button>
 
-    <div class="actions-grid">
-        <button class="btn-action" onclick="readBook()">📖 Buch lesen</button>
-        <button class="btn-action" onclick="workout()">🏋️ Sport machen</button>
+        <button class="nav-item" onclick="openMenu('Beziehungen')">
+            <div class="nav-icon">❤️</div>
+            Beziehungen
+        </button>
+        <button class="nav-item" onclick="openMenu('Aktivitäten')">
+            <div class="nav-icon">•••</div>
+            Aktivitäten
+        </button>
+    </div>
+
+    <!-- Stats am unteren Bildschirmrand -->
+    <div class="stats-section">
+        <div class="stat-row">
+            <span class="stat-label">Glücklich:</span>
+            <div class="stat-bar-bg"><div id="bar-happy" class="stat-bar-fill"></div></div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Gesundheit:</span>
+            <div class="stat-bar-bg"><div id="bar-health" class="stat-bar-fill"></div></div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Intelligenz:</span>
+            <div class="stat-bar-bg"><div id="bar-smart" class="stat-bar-fill"></div></div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Aussehen:</span>
+            <div class="stat-bar-bg"><div id="bar-looks" class="stat-bar-fill"></div></div>
+        </div>
     </div>
 </div>
 
@@ -103,23 +236,24 @@
         name: "Henri",
         age: 0,
         money: 0,
-        job: "Keiner",
+        job: "Kind",
         health: 100,
         happy: 100,
-        smart: Math.floor(Math.random() * 50) + 30,
-        looks: Math.floor(Math.random() * 50) + 30,
+        smart: Math.floor(Math.random() * 40) + 50,
+        looks: Math.floor(Math.random() * 40) + 50,
         alive: true
     };
 
     function updateUI() {
-        document.getElementById('char-name').innerText = p.name;
-        document.getElementById('char-age').innerText = p.age;
-        document.getElementById('char-money').innerText = p.money + " €";
+        document.getElementById('char-name').innerText = `${p.name} (Alter ${p.age})`;
         document.getElementById('char-job').innerText = p.job;
-        document.getElementById('char-health').innerText = p.health + "%";
-        document.getElementById('char-happy').innerText = p.happy + "%";
-        document.getElementById('char-smart').innerText = p.smart + "%";
-        document.getElementById('char-looks').innerText = p.looks + "%";
+        document.getElementById('char-money').innerText = p.money + " €";
+
+        // Fortschrittsbalken unten aktualisieren
+        document.getElementById('bar-happy').style.width = p.happy + "%";
+        document.getElementById('bar-health').style.width = p.health + "%";
+        document.getElementById('bar-smart').style.width = p.smart + "%";
+        document.getElementById('bar-looks').style.width = p.looks + "%";
     }
 
     function addLog(text) {
@@ -132,13 +266,19 @@
 
         p.age++;
 
+        if (p.age === 6) {
+            p.job = "Schüler";
+            addLog("🎓 Du wurdest in die Schule eingeschult!");
+        }
+
+        // Zufallsereignisse
         let rand = Math.random();
         if (rand < 0.2) {
             p.happy = Math.min(100, p.happy + 10);
-            addLog("Du hast einen tollen Tag im Park verbracht! (+Glück)");
-        } else if (rand < 0.4) {
-            p.health = Math.max(0, p.health - 10);
-            addLog("Du hast dich erkältet... (-Gesundheit)");
+            addLog("Du hast einen tollen Tag draußen verbracht!");
+        } else if (rand < 0.35) {
+            p.health = Math.max(0, p.health - 15);
+            addLog("Du bist krank geworden (-Gesundheit).");
         } else {
             addLog("Ein ganz normales Jahr vergeht.");
         }
@@ -151,21 +291,21 @@
         updateUI();
     }
 
-    function readBook() {
+    function openMenu(menuName) {
         if (!p.alive) return;
-        p.smart = Math.min(100, p.smart + 5);
-        addLog("Du hast ein spannendes Buch gelesen. (+Intelligenz)");
-        updateUI();
+
+        if (menuName === 'Aktivitäten') {
+            // Beispiel-Aktion im Aktivitätenmenü
+            p.smart = Math.min(100, p.smart + 5);
+            p.health = Math.min(100, p.health + 3);
+            addLog("Du hast gelernt und Sport gemacht! (+Intelligenz, +Gesundheit)");
+            updateUI();
+        } else {
+            addLog(`Menü "${menuName}" wurde geöffnet.`);
+        }
     }
 
-    function workout() {
-        if (!p.alive) return;
-        p.health = Math.min(100, p.health + 5);
-        p.happy = Math.min(100, p.happy + 3);
-        addLog("Du warst beim Sport! (+Gesundheit, +Glück)");
-        updateUI();
-    }
-
+    // Starten
     addLog("Du wurdest geboren!");
     updateUI();
 </script>
