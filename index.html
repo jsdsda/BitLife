@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BitLife Web Replica</title>
+    <title>BitLife - Life Simulator</title>
     <style>
         * {
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #0b1928;
+            background-color: #060e17;
             color: #ffffff;
             margin: 0;
             padding: 0;
@@ -21,34 +23,40 @@
         }
         .app-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 440px;
             height: 100vh;
-            max-height: 850px;
-            background-color: #0f2337;
+            max-height: 880px;
+            background-color: #0c1b2a;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
             position: relative;
             overflow: hidden;
+            border-radius: 12px;
         }
 
         /* Top Header */
         .header {
-            background-color: #0a1826;
-            padding: 12px 15px;
+            background-color: #06111e;
+            padding: 14px 15px;
             text-align: center;
-            border-bottom: 2px solid #00529b;
+            border-bottom: 3px solid #00529b;
         }
         .header h1 {
             margin: 0;
-            font-size: 20px;
-            color: #ffce00;
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffcc00;
+            letter-spacing: 0.5px;
         }
-        .header p {
-            margin: 4px 0 0 0;
+        .header-sub {
+            margin: 6px 0 0 0;
             font-size: 13px;
-            color: #9bb7d4;
+            color: #a2c4e6;
+            display: flex;
+            justify-content: space-around;
+            font-weight: 600;
         }
 
         /* Log Box */
@@ -56,19 +64,23 @@
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
-            background: #0f2337;
+            background: #0c1b2a;
             display: flex;
             flex-direction: column-reverse;
         }
         .log-entry {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 12px;
+            border-radius: 10px;
             margin-bottom: 10px;
-            font-size: 13px;
-            line-height: 1.4;
-            border-left: 3px solid #ffce00;
+            font-size: 13.5px;
+            line-height: 1.45;
+            border-left: 4px solid #ffcc00;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+        .log-entry.bad { border-left-color: #ef4444; }
+        .log-entry.good { border-left-color: #22c55e; }
+        .log-entry.crime { border-left-color: #a855f7; }
 
         /* Middle Navigation Bar */
         .nav-bar {
@@ -77,7 +89,7 @@
             height: 75px;
             align-items: center;
             position: relative;
-            border-top: 1px solid #0068c4;
+            border-top: 2px solid #0066c0;
         }
         .nav-item {
             flex: 1;
@@ -87,6 +99,7 @@
             justify-content: center;
             color: white;
             font-size: 11px;
+            font-weight: bold;
             background: none;
             border: none;
             cursor: pointer;
@@ -94,58 +107,62 @@
             height: 100%;
         }
         .nav-icon {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             background-color: #00bcd4;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 17px;
+            font-size: 18px;
             margin-bottom: 3px;
             color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
         .nav-item.center { position: relative; z-index: 10; }
         .age-btn {
-            width: 70px;
-            height: 70px;
-            background-color: #28a745;
+            width: 76px;
+            height: 76px;
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
             border: 4px solid #ffffff;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            color: #000000;
+            font-weight: 900;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
             cursor: pointer;
-            margin-top: -15px;
+            margin-top: -20px;
+            transition: transform 0.1s ease;
         }
-        .age-btn .plus { font-size: 22px; line-height: 1; }
+        .age-btn:active { transform: scale(0.92); }
+        .age-btn .plus { font-size: 26px; line-height: 1; font-weight: 900; }
 
         /* Bottom Stats Bar */
         .stats-section {
-            background-color: #0a1826;
-            padding: 12px 15px;
-            border-top: 1px solid #1a3048;
+            background-color: #06111e;
+            padding: 12px 16px;
+            border-top: 1px solid #16293d;
         }
-        .stat-row { display: flex; align-items: center; margin-bottom: 6px; }
+        .stat-row { display: flex; align-items: center; margin-bottom: 7px; }
         .stat-row:last-child { margin-bottom: 0; }
-        .stat-label { width: 90px; font-size: 12px; font-weight: bold; color: #d1e2f3; }
+        .stat-label { width: 95px; font-size: 12px; font-weight: 800; color: #b0cbe5; text-transform: uppercase; }
         .stat-bar-bg {
             flex-grow: 1;
-            height: 10px;
-            background-color: #12283e;
-            border-radius: 5px;
+            height: 12px;
+            background-color: #122538;
+            border-radius: 6px;
             overflow: hidden;
-            border: 1px solid #1a3858;
+            border: 1px solid #1d3b5a;
         }
-        .stat-bar-fill { height: 100%; background-color: #28a745; transition: width 0.3s ease; }
+        .stat-bar-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.4s ease; }
+        .stat-bar-fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
 
-        /* Fullscreen BitLife Style View */
+        /* BitLife Fullscreen Views */
         .bitlife-modal {
             display: none;
             position: absolute;
@@ -158,7 +175,7 @@
         .bitlife-header {
             background: #00529b;
             color: white;
-            padding: 12px 15px;
+            padding: 14px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -166,20 +183,20 @@
         .bitlife-header h2 {
             margin: 0;
             font-size: 18px;
-            font-weight: 800;
+            font-weight: 900;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
         .bitlife-close-btn {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.25);
             border: none;
             color: white;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             font-weight: bold;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 16px;
         }
 
         .bitlife-menu-list { flex-grow: 1; overflow-y: auto; background: #ffffff; }
@@ -188,32 +205,32 @@
         .bitlife-item {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid #e2e8f0;
             cursor: pointer;
             color: #000;
         }
         .bitlife-item:active { background: #f1f5f9; }
-        .bitlife-item-icon { font-size: 26px; margin-right: 14px; width: 32px; text-align: center; }
+        .bitlife-item-icon { font-size: 26px; margin-right: 14px; width: 34px; text-align: center; }
         .bitlife-item-text { flex-grow: 1; }
         .bitlife-item-title { font-weight: 800; font-size: 15px; color: #00529b; }
-        .bitlife-item-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+        .bitlife-item-sub { font-size: 12px; color: #64748b; margin-top: 2px; font-weight: 500; }
         .bitlife-item-arrow { color: #00529b; font-weight: bold; font-size: 16px; }
 
-        /* Special Category Headers */
+        /* Dividers & Headers */
         .bitlife-divider {
             background: #64748b;
             color: white;
-            padding: 5px 15px;
+            padding: 6px 16px;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         /* Relationship Progress Bar */
         .rel-bar-container {
-            width: 120px;
+            width: 110px;
             height: 8px;
             background: #e2e8f0;
             border-radius: 4px;
@@ -222,26 +239,49 @@
         }
         .rel-bar-fill { height: 100%; background: #22c55e; }
 
-        /* Premium / Special Banners */
-        .premium-item { background: #fefce8; }
-        
-        /* Bright Shopping Banner */
-        .shopping-btn {
-            background-color: #00e5ff;
-            color: #ffffff;
-            text-align: center;
-            padding: 16px;
-            font-size: 18px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
+        /* Choice Overlay Dialogs (Echte BitLife Entscheidungspopups) */
+        .choice-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 300;
             justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            align-items: center;
+            padding: 20px;
         }
+        .choice-card {
+            background: #ffffff;
+            color: #000000;
+            width: 100%;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .choice-icon { font-size: 45px; margin-bottom: 10px; }
+        .choice-title { font-size: 20px; font-weight: 900; color: #00529b; margin-bottom: 10px; }
+        .choice-desc { font-size: 14px; color: #334155; margin-bottom: 20px; line-height: 1.4; }
+        .choice-option-btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 8px;
+            background: #00529b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .choice-option-btn:last-child { margin-bottom: 0; }
+        .choice-option-btn.danger { background: #ef4444; }
+        .choice-option-btn.secondary { background: #64748b; }
     </style>
 </head>
 <body>
@@ -250,7 +290,13 @@
     <!-- Header -->
     <div class="header">
         <h1 id="char-name">Sariyah Daher 🏀</h1>
-        <p><span id="char-job">Arbeitslos</span> | Bankguthaben: <span id="char-money">0 $</span></p>
+        <div class="header-sub">
+            <span>Alter: <span id="char-age">14</span></span>
+            <span>Guthaben: <span id="char-money">0 $</span></span>
+        </div>
+        <div class="header-sub" style="margin-top: 4px; color: #ffce00;">
+            <span id="char-job">Schüler</span>
+        </div>
     </div>
 
     <!-- Event Log -->
@@ -260,7 +306,7 @@
     <div class="nav-bar">
         <button class="nav-item" onclick="openView('job')">
             <div class="nav-icon">💼</div>
-            Tätigkeit
+            Karriere
         </button>
         <button class="nav-item" onclick="openView('assets')">
             <div class="nav-icon">💰</div>
@@ -270,13 +316,13 @@
         <button class="nav-item center" onclick="ageUp()">
             <div class="age-btn">
                 <span class="plus">+</span>
-                <span>Alter</span>
+                <span>ALTER</span>
             </div>
         </button>
 
         <button class="nav-item" onclick="openView('relationships')">
             <div class="nav-icon">❤️</div>
-            Beziehungen
+            Kontakte
         </button>
         <button class="nav-item" onclick="openView('activities')">
             <div class="nav-icon">•••</div>
@@ -287,35 +333,46 @@
     <!-- Stats Bar -->
     <div class="stats-section">
         <div class="stat-row">
-            <span class="stat-label">Glücklich:</span>
+            <span class="stat-label">Glück</span>
             <div class="stat-bar-bg"><div id="bar-happy" class="stat-bar-fill"></div></div>
         </div>
         <div class="stat-row">
-            <span class="stat-label">Gesundheit:</span>
+            <span class="stat-label">Gesundheit</span>
             <div class="stat-bar-bg"><div id="bar-health" class="stat-bar-fill"></div></div>
         </div>
         <div class="stat-row">
-            <span class="stat-label">Intelligenz:</span>
+            <span class="stat-label">Smart</span>
             <div class="stat-bar-bg"><div id="bar-smart" class="stat-bar-fill"></div></div>
         </div>
         <div class="stat-row">
-            <span class="stat-label">Aussehen:</span>
+            <span class="stat-label">Aussehen</span>
             <div class="stat-bar-bg"><div id="bar-looks" class="stat-bar-fill"></div></div>
         </div>
     </div>
 
-    <!-- Universal BitLife Overlay Screen -->
+    <!-- Universal BitLife Menu Overlay -->
     <div id="bitlife-modal" class="bitlife-modal">
         <div class="bitlife-header">
             <button class="bitlife-close-btn" onclick="closeView()">✕</button>
             <h2 id="bitlife-title">MENÜ</h2>
-            <div style="width:30px;"></div>
+            <div style="width:32px;"></div>
         </div>
         <div class="bitlife-menu-list" id="bitlife-content"></div>
+    </div>
+
+    <!-- Universal BitLife Choice Popup -->
+    <div id="choice-overlay" class="choice-overlay">
+        <div class="choice-card">
+            <div id="choice-icon" class="choice-icon">❓</div>
+            <div id="choice-title" class="choice-title">ENTSCHEIDUNG</div>
+            <div id="choice-desc" class="choice-desc">Was möchtest du tun?</div>
+            <div id="choice-options"></div>
+        </div>
     </div>
 </div>
 
 <script>
+    // --- SPIELER DATEN ---
     let p = {
         name: "Sariyah Daher",
         age: 14,
@@ -324,185 +381,294 @@
         job: "Arbeitslos",
         salary: 0,
         health: 85,
-        happy: 70,
+        happy: 75,
         smart: 80,
-        looks: 75,
+        looks: 70,
         alive: true,
+        inJail: false,
+        jailYears: 0,
+        disease: null,
+        pets: [],
         relationships: [
-            { cat: "Eltern", name: "Yamila Daher", role: "Mutter", rel: 90, alive: true },
-            { cat: "Eltern", name: "Aladdin Antoun", role: "Stiefvater", rel: 65, alive: true },
-            { cat: "Geschwister", name: "Saladin Antoun", role: "Halb-Bruder", rel: 55, alive: true },
-            { cat: "Geschwister", name: "Borak Antoun", role: "Halb-Bruder", rel: 25, alive: true },
-            { cat: "Freunde", name: "Adham Baba", role: "Freund", rel: 10, alive: true },
-            { cat: "Verstorbene", name: "Adham Antoun", role: "Halb-Bruder", rel: 0, alive: false, note: "Vor 10 Jahren gestorben" }
+            { id: 1, cat: "Eltern", name: "Yamila Daher", role: "Mutter", rel: 90, alive: true },
+            { id: 2, cat: "Eltern", name: "Aladdin Antoun", role: "Stiefvater", rel: 65, alive: true },
+            { id: 3, cat: "Geschwister", name: "Saladin Antoun", role: "Halb-Bruder", rel: 55, alive: true },
+            { id: 4, cat: "Freunde", name: "Adham Baba", role: "Bester Freund", rel: 80, alive: true }
         ]
     };
 
+    const jobsList = [
+        { title: "Fast-Food-Mitarbeiter/in", salary: 16000, reqSmart: 10 },
+        { title: "Kellner / Kellnerin", salary: 21000, reqSmart: 20 },
+        { title: "Büroassistent/in", salary: 32000, reqSmart: 45 },
+        { title: "Informatiker/in", salary: 68000, reqSmart: 70 },
+        { title: "Feuerwehrmann/-frau", salary: 52000, reqSmart: 50 },
+        { title: "Unternehmensberater/in", salary: 95000, reqSmart: 85 }
+    ];
+
+    const petShopList = [
+        { type: "Hund", breed: "Golden Retriever", price: 800, health: 90, happy: 95 },
+        { type: "Hund", breed: "Mops", price: 500, health: 70, happy: 80 },
+        { type: "Katze", breed: "Perserkatze", price: 400, health: 85, happy: 60 }
+    ];
+
+    // --- UI UPDATES ---
     function updateUI() {
         document.getElementById('char-name').innerText = `${p.name} 🏀`;
-        document.getElementById('char-job').innerText = p.job !== "Arbeitslos" ? p.job : p.status;
-        document.getElementById('char-money').innerText = p.money + " $";
+        document.getElementById('char-age').innerText = p.age;
+        document.getElementById('char-money').innerText = p.money.toLocaleString() + " $";
+        
+        let displayJob = p.inJail ? "🔒 Im Gefängnis" : (p.job !== "Arbeitslos" ? p.job : p.status);
+        document.getElementById('char-job').innerText = displayJob;
 
-        document.getElementById('bar-happy').style.width = p.happy + "%";
-        document.getElementById('bar-health').style.width = p.health + "%";
-        document.getElementById('bar-smart').style.width = p.smart + "%";
-        document.getElementById('bar-looks').style.width = p.looks + "%";
+        updateBar('bar-happy', p.happy);
+        updateBar('bar-health', p.health);
+        updateBar('bar-smart', p.smart);
+        updateBar('bar-looks', p.looks);
     }
 
-    function addLog(text) {
+    function updateBar(id, val) {
+        const el = document.getElementById(id);
+        el.style.width = Math.max(0, Math.min(100, val)) + "%";
+        if (val < 30) el.classList.add('low');
+        else el.classList.remove('low');
+    }
+
+    function addLog(text, type = "normal") {
         const box = document.getElementById('log-box');
-        box.innerHTML = `<div class="log-entry"><strong>Alter ${p.age}:</strong> ${text}</div>` + box.innerHTML;
+        let cssClass = "log-entry";
+        if (type === "good") cssClass += " good";
+        if (type === "bad") cssClass += " bad";
+        if (type === "crime") cssClass += " crime";
+
+        box.innerHTML = `<div class="${cssClass}"><strong>Alter ${p.age}:</strong> ${text}</div>` + box.innerHTML;
     }
 
+    function clampStats() {
+        p.happy = Math.max(0, Math.min(100, p.happy));
+        p.health = Math.max(0, Math.min(100, p.health));
+        p.smart = Math.max(0, Math.min(100, p.smart));
+        p.looks = Math.max(0, Math.min(100, p.looks));
+
+        if (p.health <= 0 && p.alive) {
+            p.alive = false;
+            triggerChoice('💀 Gestorben', 'Du bist aufgrund schlechter Gesundheit gestorben.', [
+                { text: 'Neues Leben starten', action: () => location.reload() }
+            ]);
+        }
+    }
+
+    // --- ALTERN & RANDOM EVENTS ---
     function ageUp() {
         if (!p.alive) return;
         p.age++;
-        if (p.salary > 0) p.money += p.salary;
-        addLog("Ein weiteres Jahr vergeht.");
+
+        // Gefängnis-Logik
+        if (p.inJail) {
+            p.jailYears--;
+            p.happy -= 10;
+            p.health -= 5;
+            if (p.jailYears <= 0) {
+                p.inJail = false;
+                addLog("🔓 Du hast deine Gefängnisstrafe abgesessen und bist wieder frei!", "good");
+            } else {
+                addLog(`🔒 Du hast ein weiteres Jahr im Gefängnis verbracht. Noch ${p.jailYears} Jahre verbleibend.`, "bad");
+            }
+            clampStats(); updateUI(); return;
+        }
+
+        // Einkommen & Schule
+        if (p.age === 18 && p.status === "Schüler") {
+            p.status = "Arbeitslos";
+            addLog("🎓 Du hast den Schulabschluss gemacht!", "good");
+        }
+        if (p.salary > 0) {
+            p.money += p.salary;
+            addLog(`💰 Du hast dein Jahresgehalt von ${p.salary.toLocaleString()} $ erhalten.`);
+        }
+
+        // Zufallsevents
+        let rand = Math.random();
+        if (rand < 0.15 && !p.disease) {
+            const diseases = ["Grippe", "Depression", "Rückenschmerzen", "Migräne"];
+            p.disease = diseases[Math.floor(Math.random() * diseases.length)];
+            p.health -= 20;
+            p.happy -= 15;
+            addLog(`🤒 Du bist an ${p.disease} erkrankt!`, "bad");
+        } else if (rand > 0.85) {
+            p.happy += 15;
+            addLog("🌟 Du hattest ein fantastisches Jahr und fühlst dich glücklich!", "good");
+        } else if (rand > 0.40 && rand < 0.50 && p.age >= 12) {
+            triggerRandomEvent();
+            return;
+        } else {
+            addLog("Ein weiteres Jahr vergeht.");
+        }
+
+        clampStats();
         updateUI();
     }
 
+    // --- CHOICE MODAL SYSTEM ---
+    function triggerChoice(title, desc, options, icon = "⚡") {
+        document.getElementById('choice-icon').innerText = icon;
+        document.getElementById('choice-title').innerText = title;
+        document.getElementById('choice-desc').innerText = desc;
+        
+        const container = document.getElementById('choice-options');
+        container.innerHTML = "";
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = `choice-option-btn ${opt.style || ''}`;
+            btn.innerText = opt.text;
+            btn.onclick = () => {
+                document.getElementById('choice-overlay').style.display = 'none';
+                opt.action();
+                clampStats();
+                updateUI();
+            };
+            container.appendChild(btn);
+        });
+
+        document.getElementById('choice-overlay').style.display = 'flex';
+    }
+
+    function triggerRandomEvent() {
+        triggerChoice("Schul-Vorfall", "Ein Mitschüler beleidigt dich auf dem Pausenhof!", [
+            { text: "Ignorieren", action: () => { addLog("Du hast den Mitschüler ignoriert."); p.happy -= 5; } },
+            { text: "Zurückbeleidigen", action: () => { addLog("Du hast ihn beschimpft!"); p.happy += 5; } },
+            { text: "Verprügeln", action: () => { 
+                if(Math.random() > 0.5) {
+                    addLog("Du hast die Schlägerei gewonnen!", "good"); p.happy += 10;
+                } else {
+                    addLog("Du hast in der Schlägerei verloren...", "bad"); p.health -= 15;
+                }
+            }, style: "danger" }
+        ], "🏫");
+    }
+
+    // --- MODAL VIEWS ---
     function closeView() {
         document.getElementById('bitlife-modal').style.display = 'none';
     }
 
     function openView(type) {
         if (!p.alive) return;
+        if (p.inJail && type !== 'activities') {
+            alert("Im Gefängnis hast du keinen Zugriff auf diesen Bereich!");
+            return;
+        }
+
         const modal = document.getElementById('bitlife-modal');
         const title = document.getElementById('bitlife-title');
         const content = document.getElementById('bitlife-content');
         modal.style.display = 'flex';
 
-        // 1. BESITZ SCREEN (1:1 basierend auf deinen zwei neuesten Screenshots)
-        if (type === 'assets') {
-            title.innerText = "BESITZ";
+        // 1. KARRIERE
+        if (type === 'job') {
+            title.innerText = "KARRIERE";
             content.innerHTML = `
-                <div class="bitlife-divider">Finanzen</div>
-                ${createActItem('💰', 'Finanzen', 'Deine Finanzen ansehen', 'addLog("Du hast deine Finanzen überprüft.")', '•••')}
-                ${createActItem('📊', 'Investments', 'Verwalte dein Anlageportfolio', '', '')}
-
-                <div class="bitlife-divider">Casino</div>
-                ${createActItem('🎰', 'Neues Casino', 'Eröffne ein Casino', '', '')}
-
-                <div class="bitlife-divider">Nur für dich</div>
-                ${createActItem('🕵️', 'Geheimagent', 'Gründe eine Spionageagentur, erfülle Missionen und mehr!', '', '')}
-                ${createActItem('🏢', 'Vermieter', 'Verwalte Mieter, schalte neue Häuser frei und mehr!', '', '')}
-
-                <div class="bitlife-divider">Premiumvermögenswerte</div>
-                ${createActItem('💎', 'Luxus Lifestyle', 'Vermögen', '', '', true)}
-
-                <div class="bitlife-divider">Zoo</div>
-                ${createActItem('🦁', 'Zoo', 'Einen Zoo kaufen', '', '')}
-
-                <div class="bitlife-divider">Sammelgegenstände</div>
-                ${createActItem('🎒', 'Habseligkeiten', 'Deine Besitztümer ansehen', 'addLog("Du schaust deine Habseligkeiten an.")', '')}
-                ${createActItem('🏛️', 'Museum', 'Deine Sammlerstücke ausstellen', '', '')}
-                ${createActItem('🔨', 'Auktionshäuser', 'Seltene Sammlerstücke kaufen', '', '❯')}
-
-                <div class="bitlife-divider">Sonstige</div>
-                ${createActItem('👤', 'Social Media', 'Deine Online-Identität verwalten', '', '❯')}
-
-                <div class="shopping-btn" onclick="addLog('Du gehst bummeln...'); closeView();">
-                    🛍️ Bummeln gehen...
+                <div class="bitlife-divider">Aktueller Status</div>
+                <div class="bitlife-item">
+                    <div class="bitlife-item-icon">💼</div>
+                    <div class="bitlife-item-text">
+                        <div class="bitlife-item-title">${p.job !== "Arbeitslos" ? p.job : p.status}</div>
+                        <div class="bitlife-item-sub">${p.salary > 0 ? 'Gehalt: ' + p.salary.toLocaleString() + ' $ / Jahr' : 'Kein Einkommen'}</div>
+                    </div>
                 </div>
+
+                <div class="bitlife-divider">Optionen</div>
+                ${p.status === "Schüler" ? createActItem('📚', 'Fleißig lernen', 'Verbessere deine Noten & Intelligenz', 'studyHard()', '❯') : ''}
+                ${p.job !== "Arbeitslos" ? createActItem('📈', 'Härter arbeiten', 'Bessere Chancen auf Beförderung', 'workHarder()', '❯') : ''}
+                ${createActItem('💵', 'Jobsuche', 'Finde einen neuen Vollzeitjob', 'openJobSearch()', '❯')}
+            `;
+            if (p.job !== "Arbeitslos") {
+                content.innerHTML += `<div style="padding:15px;"><button onclick="quitJob()" class="choice-option-btn danger">Job kündigen</button></div>`;
+            }
+        }
+
+        // 2. BESITZ
+        else if (type === 'assets') {
+            title.innerText = "BESITZ & VERMÖGEN";
+            content.innerHTML = `
+                <div class="bitlife-divider">Guthaben</div>
+                <div class="bitlife-item">
+                    <div class="bitlife-item-icon">🏦</div>
+                    <div class="bitlife-item-text">
+                        <div class="bitlife-item-title">Bankkonto</div>
+                        <div class="bitlife-item-sub">Guthaben: ${p.money.toLocaleString()} $</div>
+                    </div>
+                </div>
+
+                <div class="bitlife-divider">Haustiere (${p.pets.length})</div>
+                ${p.pets.map(pet => createActItem('🐾', pet.breed, `Gesundheit: ${pet.health}%`, '', '❯')).join('')}
+                ${createActItem('🐶', 'Tierhandlung / Tierheim', 'Kaufe dir ein neues Haustier', 'openPetShop()', '❯')}
             `;
         }
 
-        // 2. BEZIEHUNGEN SCREEN
+        // 3. KONTAKTE
         else if (type === 'relationships') {
             title.innerText = "BEZIEHUNGEN";
             content.innerHTML = "";
-
-            const categories = ["Eltern", "Geschwister", "Freunde", "Verstorbene"];
+            const categories = ["Eltern", "Geschwister", "Freunde"];
 
             categories.forEach(cat => {
                 const items = p.relationships.filter(r => r.cat === cat);
                 if (items.length > 0) {
                     content.innerHTML += `<div class="bitlife-divider">${cat}</div>`;
                     items.forEach(r => {
-                        if (r.alive) {
-                            content.innerHTML += `
-                                <div class="bitlife-item" onclick="interactRel('${r.name}')">
-                                    <div class="bitlife-item-icon">👤</div>
-                                    <div class="bitlife-item-text">
-                                        <div class="bitlife-item-title">${r.name} <span style="font-weight:normal; color:#64748b;">(${r.role})</span></div>
-                                        <div style="display:flex; align-items:center; gap:8px;">
-                                            <span style="font-size:12px; color:#64748b;">Beziehung</span>
-                                            <div class="rel-bar-container">
-                                                <div class="rel-bar-fill" style="width:${r.rel}%; background:${r.rel < 40 ? '#ef4444' : '#22c55e'};"></div>
-                                            </div>
+                        content.innerHTML += `
+                            <div class="bitlife-item" onclick="interactRel(${r.id})">
+                                <div class="bitlife-item-icon">👤</div>
+                                <div class="bitlife-item-text">
+                                    <div class="bitlife-item-title">${r.name} <span style="font-size:12px; color:#64748b;">(${r.role})</span></div>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <div class="rel-bar-container">
+                                            <div class="rel-bar-fill" style="width:${r.rel}%;"></div>
                                         </div>
                                     </div>
-                                    <div class="bitlife-item-arrow">❯</div>
                                 </div>
-                            `;
-                        } else {
-                            content.innerHTML += `
-                                <div class="bitlife-item" style="opacity:0.7;">
-                                    <div class="bitlife-item-icon">💀</div>
-                                    <div class="bitlife-item-text">
-                                        <div class="bitlife-item-title" style="color:#475569;">${r.name} <span style="font-weight:normal;">(${r.role})</span></div>
-                                        <div class="bitlife-item-sub">${r.note}</div>
-                                    </div>
-                                    <div class="bitlife-item-arrow">• • •</div>
-                                </div>
-                            `;
-                        }
+                                <div class="bitlife-item-arrow">❯</div>
+                            </div>
+                        `;
                     });
                 }
             });
         }
 
-        // 3. AKTIVITÄTEN SCREEN
+        // 4. AKTIVITÄTEN
         else if (type === 'activities') {
             title.innerText = "AKTIVITÄTEN";
+            if (p.inJail) {
+                content.innerHTML = `
+                    <div class="bitlife-divider">Gefängnis-Aktivitäten</div>
+                    ${createActItem('🏋️', 'Knast-Fitness', 'Fitness im Hof machen', 'doGym()', '❯')}
+                    ${createActItem('🚨', 'Ausbruch versuchen', 'Versuche aus dem Gefängnis zu fliehen', 'escapeJail()', '❯')}
+                `;
+                return;
+            }
+
             content.innerHTML = `
-                <div class="bitlife-divider">Favoriten</div>
-                ${createActItem('❤️', 'Liebe', 'Die große Liebe suchen', '', '❯')}
-                ${createActItem('🧘', 'Körper und Geist', 'An dir arbeiten', '', '❯')}
-                ${createActItem('🐶', 'Haustiere', 'Ein Haustier anschaffen', 'addLog("Du warst im Tierheim.")', '• • •')}
-                ${createActItem('💆', 'Salon und Spa', 'Zeit für dich selbst nehmen', 'addLog("Du warst im Spa.")', '❯')}
+                <div class="bitlife-divider">Gesundheit & Geist</div>
+                ${createActItem('🏋️', 'Fitnessstudio', 'Trainieren (+Gesundheit, +Aussehen)', 'doGym()', '❯')}
+                ${createActItem('📚', 'Bibliothek', 'Bücher lesen (+Intelligenz)', 'doLibrary()', '❯')}
+                ${createActItem('👨‍⚕️', 'Arzt aufsuchen', 'Krankheiten heilen lassen', 'openDoctor()', '❯')}
 
-                <div class="bitlife-divider">Premium-Aktivitäten</div>
-                ${createActItem('🧟', 'Albtraum des Grauens', 'Lebe ein besonderes Horrorszenario', '', '✦', true)}
-                ${createActItem('🌳', 'Outdoor-Lifestyle', 'Zeit mit Mutter Natur verbringen', '', '✦', true)}
-                ${createActItem('💎', 'Luxus Lifestyle', 'Vermögen aufbauen', '', '✦', true)}
-                ${createActItem('🦁', 'Zoo', 'Einen Zoo kaufen', '', '✦', true)}
-
-                <div class="bitlife-divider">Alle</div>
-                ${createActItem('👒', 'Accessoires', 'Lege dir coole Accessoires an', '', '❯')}
-                ${createActItem('🧸', 'Adoption', 'Ein Kind adoptieren', '', '• • •')}
-                ${createActItem('♠️', 'Casino', 'Das Casino besuchen', '', '• • •')}
-                ${createActItem('👺', 'Kriminalität', 'Ein Verbrechen begehen', '', '❯')}
-                ${createActItem('👨‍⚕️', 'Doktor', 'Zum Arzt gehen', '', '❯')}
-                ${createActItem('🌐', 'Emigrieren', 'In ein anderes Land auswandern', '', '• • •')}
-                ${createActItem('🛍️', 'Bummeln', 'Shoppen gehen', '', '• • •')}
-                ${createActItem('👥', 'Social Media', 'Deine Online-Identität verwalten', '', '❯')}
+                <div class="bitlife-divider">Sonderaktivitäten</div>
+                ${createActItem('👺', 'Kriminalität', 'Verbrechen begehen (Geld machen)', 'openCrime()', '❯')}
+                ${createActItem('🛍️', 'Bummeln', 'Shoppen gehen (+Glück)', 'doShopping()', '❯')}
 
                 <div style="padding: 15px;">
-                    <button onclick="addLog('🏳️ Du hast dein Leben aufgegeben.'); p.alive=false; closeView(); updateUI();" style="width:100%; padding:12px; background:#00bcd4; color:white; border:none; font-weight:bold; border-radius:6px; cursor:pointer;">🏳️ Aufgeben...</button>
+                    <button onclick="surrenderLife()" class="choice-option-btn danger">🏳️ Aufgeben (Leben beenden)</button>
                 </div>
             `;
         }
-
-        // 4. TÄTIGKEIT SCREEN
-        else if (type === 'job') {
-            title.innerText = "TÄTIGKEIT";
-            content.innerHTML = `
-                ${createActItem('🎓', 'Bildung', 'Wieder zur Schule gehen', '', '❯')}
-                ${createActItem('🧢', 'Gelegenheitsjobs', 'Schnelles Geld machen', '', '❯')}
-                ${createActItem('💵', 'Jobs', 'Vollzeitjobs durchsuchen', '', '❯')}
-                ${createActItem('🛡️', 'Militär', 'Dem Militär beitreten', '', '❯')}
-                ${createActItem('🕒', 'Teilzeitjobs', 'Teilzeitjobs durchsuchen', '', '❯')}
-            `;
-        } else {
-            closeView();
-        }
     }
 
-    function createActItem(icon, title, sub, action, arrow, isPremium = false) {
+    function createActItem(icon, title, sub, action, arrow) {
         return `
-            <div class="bitlife-item ${isPremium ? 'premium-item' : ''}" onclick="${action}">
+            <div class="bitlife-item" onclick="${action}">
                 <div class="bitlife-item-icon">${icon}</div>
                 <div class="bitlife-item-text">
                     <div class="bitlife-item-title">${title}</div>
@@ -513,17 +679,219 @@
         `;
     }
 
-    function interactRel(name) {
-        let r = p.relationships.find(item => item.name === name);
-        if (r) {
-            r.rel = Math.min(100, r.rel + 10);
-            p.happy = Math.min(100, p.happy + 5);
-            addLog(`Du hast Zeit mit ${r.name} verbracht.`);
-            openView('relationships');
-            updateUI();
+    // --- GEFÄNGNIS & KRIMINALITÄT ---
+    function openCrime() {
+        triggerChoice("Kriminalität", "Welches Verbrechen möchtest du begehen?", [
+            { text: "Taschendiebstahl", action: () => commitCrime('pocket') },
+            { text: "Auto stehlen", action: () => commitCrime('car') },
+            { text: "Banküberfall", action: () => commitCrime('bank'), style: "danger" },
+            { text: "Abbrechen", action: () => {}, style: "secondary" }
+        ], "👺");
+    }
+
+    function commitCrime(type) {
+        closeView();
+        let chance = Math.random();
+
+        if (type === 'pocket') {
+            if (chance > 0.3) {
+                let gain = Math.floor(Math.random() * 100) + 30;
+                p.money += gain;
+                addLog(`👺 Du hast erfolgreich eine Geldbörse gestohlen (+${gain} $)!`, "crime");
+            } else {
+                arrest(2, "Taschendiebstahl");
+            }
+        } else if (type === 'car') {
+            if (chance > 0.6) {
+                let gain = Math.floor(Math.random() * 4000) + 1500;
+                p.money += gain;
+                addLog(`🚗 Du hast ein Auto gestohlen und verkauft (+${gain} $)!`, "crime");
+            } else {
+                arrest(5, "Autodiebstahl");
+            }
+        } else if (type === 'bank') {
+            if (chance > 0.85) {
+                let gain = Math.floor(Math.random() * 30000) + 10000;
+                p.money += gain;
+                addLog(`🏦 Unfassbar! Der Banküberfall war erfolgreich (+${gain} $)!`, "crime");
+            } else {
+                arrest(10, "Bewaffneter Banküberfall");
+            }
         }
     }
 
+    function arrest(years, crimeName) {
+        triggerChoice("🚨 FESTGENOMMEN!", `Die Polizei hat dich wegen ${crimeName} erwischt! Du wurdest zu ${years} Jahren Gefängnis verurteilt!`, [
+            { text: "Strafe akzeptieren", action: () => {
+                p.inJail = true;
+                p.jailYears = years;
+                p.job = "Arbeitslos";
+                p.salary = 0;
+                addLog(`🚨 Du wurdest wegen ${crimeName} zu ${years} Jahren Haft verurteilt!`, "bad");
+            }, style: "danger" }
+        ], "🚔");
+    }
+
+    function escapeJail() {
+        closeView();
+        if (Math.random() > 0.7) {
+            p.inJail = false;
+            p.jailYears = 0;
+            addLog("🏃 KINOREIF! Du bist erfolgreich aus dem Gefängnis geflohen!", "good");
+        } else {
+            p.jailYears += 2;
+            addLog("🚨 Dein Ausbruchsversuch ist gescheitert! Deine Strafe wurde um 2 Jahre erhöht.", "bad");
+        }
+        clampStats(); updateUI();
+    }
+
+    // --- ARZT & GESUNDHEIT ---
+    function openDoctor() {
+        let desc = p.disease ? `Du leidest an: ${p.disease}` : "Du hast keine bekannten Krankheiten.";
+        triggerChoice("🩺 Arztbesuch", desc, [
+            { text: "Behandeln lassen (100 $)", action: () => {
+                if (p.money < 100) { alert("Nicht genug Geld!"); return; }
+                p.money -= 100;
+                if (p.disease) {
+                    if (Math.random() > 0.25) {
+                        addLog(`🩺 Der Arzt hat deine ${p.disease} geheilt!`, "good");
+                        p.disease = null;
+                        p.health += 25;
+                    } else {
+                        addLog(`🩺 Die Behandlung für ${p.disease} schlug fehl.`, "bad");
+                    }
+                } else {
+                    p.health += 10;
+                    addLog("🩺 Der Arzt hat dich durchgecheckt. Du bist kerngesund!");
+                }
+            }},
+            { text: "Verlassen", action: () => {}, style: "secondary" }
+        ], "👨‍⚕️");
+    }
+
+    // --- HAUSTIERE ---
+    function openPetShop() {
+        const content = document.getElementById('bitlife-content');
+        content.innerHTML = `<div class="bitlife-divider">Verfügbare Tiere</div>`;
+        petShopList.forEach((pet, index) => {
+            content.innerHTML += createActItem('🐾', `${pet.breed} (${pet.type})`, `Preis: ${pet.price} $`, `buyPet(${index})`, 'Kaufen');
+        });
+    }
+
+    function buyPet(index) {
+        let pet = petShopList[index];
+        if (p.money < pet.price) {
+            alert("Du hast nicht genug Geld!");
+            return;
+        }
+        p.money -= pet.price;
+        p.pets.push(pet);
+        p.happy += 15;
+        addLog(`🐶 Du hast dir einen ${pet.breed} gekauft!`, "good");
+        closeView(); updateUI();
+    }
+
+    // --- JOBS & SCHULE ---
+    function openJobSearch() {
+        if (p.age < 18) {
+            alert("Du musst mindestens 18 Jahre alt sein!");
+            return;
+        }
+        const content = document.getElementById('bitlife-content');
+        content.innerHTML = `<div class="bitlife-divider">Stellenangebote</div>`;
+        jobsList.forEach((job, index) => {
+            content.innerHTML += createActItem('💼', job.title, `Gehalt: ${job.salary.toLocaleString()} $ / Jahr`, `applyJob(${index})`, 'Bewerben');
+        });
+    }
+
+    function applyJob(index) {
+        let job = jobsList[index];
+        if (p.smart >= job.reqSmart) {
+            p.job = job.title;
+            p.salary = job.salary;
+            addLog(`🎉 Du hast den Job als ${job.title} bekommen!`, "good");
+        } else {
+            addLog(`❌ Absage als ${job.title} (Zu wenig Intelligenz).`, "bad");
+        }
+        closeView(); updateUI();
+    }
+
+    function studyHard() {
+        p.smart += 6;
+        addLog("📚 Du hast in der Schule extra hart gelernt!");
+        closeView(); clampStats(); updateUI();
+    }
+
+    function workHarder() {
+        p.happy -= 5;
+        addLog("💼 Du hast Überstunden gemacht, um deinen Chef zu beeindrucken.");
+        closeView(); clampStats(); updateUI();
+    }
+
+    function quitJob() {
+        addLog(`Du hast deinen Job als ${p.job} gekündigt.`);
+        p.job = "Arbeitslos";
+        p.salary = 0;
+        closeView(); updateUI();
+    }
+
+    // --- SONSTIGE AKTIVITÄTEN ---
+    function doGym() {
+        p.health += 8;
+        p.looks += 4;
+        addLog("🏋️ Du warst im Fitnessstudio trainieren.");
+        closeView(); clampStats(); updateUI();
+    }
+
+    function doLibrary() {
+        p.smart += 6;
+        addLog("📚 Du hast ein paar lehrreiche Bücher gelesen.");
+        closeView(); clampStats(); updateUI();
+    }
+
+    function doShopping() {
+        if (p.money < 50) { alert("Du brauchst mindestens 50 $!"); return; }
+        p.money -= 50;
+        p.happy += 10;
+        addLog("🛍️ Du hast dir ein paar neue Sachen gekauft.");
+        closeView(); clampStats(); updateUI();
+    }
+
+    function interactRel(id) {
+        let r = p.relationships.find(item => item.id === id);
+        if (r) {
+            triggerChoice(r.name, `Was möchtest du mit deinem/deiner ${r.role} machen?`, [
+                { text: "Zeit verbringen", action: () => {
+                    r.rel = Math.min(100, r.rel + 12);
+                    p.happy += 6;
+                    addLog(`Du hast eine tolle Zeit mit ${r.name} verbracht.`);
+                }},
+                { text: "Kompliment machen", action: () => {
+                    r.rel = Math.min(100, r.rel + 8);
+                    addLog(`Du hast ${r.name} ein nettes Kompliment gemacht.`);
+                }},
+                { text: "Streit anfangen", action: () => {
+                    r.rel = Math.max(0, r.rel - 20);
+                    p.happy -= 10;
+                    addLog(`Du hast dich heftig mit ${r.name} gestritten!`, "bad");
+                }, style: "danger" }
+            ], "👤");
+        }
+    }
+
+    function surrenderLife() {
+        triggerChoice("Leben begeben?", "Möchtest du dieses Leben wirklich aufgeben?", [
+            { text: "Ja, Leben beenden", action: () => {
+                p.alive = false;
+                addLog("🏳️ Du hast dein Leben aufgegeben.");
+                closeView(); updateUI();
+            }, style: "danger" },
+            { text: "Nein, weiterleben", action: () => {}, style: "secondary" }
+        ], "🏳️");
+    }
+
+    // Init App
+    addLog("Du bist als Sariyah Daher geboren.");
     updateUI();
 </script>
 
