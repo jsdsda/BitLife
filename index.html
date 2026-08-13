@@ -222,16 +222,25 @@
         }
         .rel-bar-fill { height: 100%; background: #22c55e; }
 
-        /* Premium Banners */
+        /* Premium / Special Banners */
         .premium-item { background: #fefce8; }
-        .premium-badge {
-            background: #64748b;
-            color: white;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
+        
+        /* Bright Shopping Banner */
+        .shopping-btn {
+            background-color: #00e5ff;
+            color: #ffffff;
+            text-align: center;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -275,7 +284,7 @@
         </button>
     </div>
 
-    <!-- Stats Table -->
+    <!-- Stats Bar -->
     <div class="stats-section">
         <div class="stat-row">
             <span class="stat-label">Glücklich:</span>
@@ -295,7 +304,7 @@
         </div>
     </div>
 
-    <!-- Universal BitLife Screen Overlay -->
+    <!-- Universal BitLife Overlay Screen -->
     <div id="bitlife-modal" class="bitlife-modal">
         <div class="bitlife-header">
             <button class="bitlife-close-btn" onclick="closeView()">✕</button>
@@ -364,8 +373,43 @@
         const content = document.getElementById('bitlife-content');
         modal.style.display = 'flex';
 
-        // 1. BEZIEHUNGEN SCREEN (Visuals Exakt wie Bild 5)
-        if (type === 'relationships') {
+        // 1. BESITZ SCREEN (1:1 basierend auf deinen zwei neuesten Screenshots)
+        if (type === 'assets') {
+            title.innerText = "BESITZ";
+            content.innerHTML = `
+                <div class="bitlife-divider">Finanzen</div>
+                ${createActItem('💰', 'Finanzen', 'Deine Finanzen ansehen', 'addLog("Du hast deine Finanzen überprüft.")', '•••')}
+                ${createActItem('📊', 'Investments', 'Verwalte dein Anlageportfolio', '', '')}
+
+                <div class="bitlife-divider">Casino</div>
+                ${createActItem('🎰', 'Neues Casino', 'Eröffne ein Casino', '', '')}
+
+                <div class="bitlife-divider">Nur für dich</div>
+                ${createActItem('🕵️', 'Geheimagent', 'Gründe eine Spionageagentur, erfülle Missionen und mehr!', '', '')}
+                ${createActItem('🏢', 'Vermieter', 'Verwalte Mieter, schalte neue Häuser frei und mehr!', '', '')}
+
+                <div class="bitlife-divider">Premiumvermögenswerte</div>
+                ${createActItem('💎', 'Luxus Lifestyle', 'Vermögen', '', '', true)}
+
+                <div class="bitlife-divider">Zoo</div>
+                ${createActItem('🦁', 'Zoo', 'Einen Zoo kaufen', '', '')}
+
+                <div class="bitlife-divider">Sammelgegenstände</div>
+                ${createActItem('🎒', 'Habseligkeiten', 'Deine Besitztümer ansehen', 'addLog("Du schaust deine Habseligkeiten an.")', '')}
+                ${createActItem('🏛️', 'Museum', 'Deine Sammlerstücke ausstellen', '', '')}
+                ${createActItem('🔨', 'Auktionshäuser', 'Seltene Sammlerstücke kaufen', '', '❯')}
+
+                <div class="bitlife-divider">Sonstige</div>
+                ${createActItem('👤', 'Social Media', 'Deine Online-Identität verwalten', '', '❯')}
+
+                <div class="shopping-btn" onclick="addLog('Du gehst bummeln...'); closeView();">
+                    🛍️ Bummeln gehen...
+                </div>
+            `;
+        }
+
+        // 2. BEZIEHUNGEN SCREEN
+        else if (type === 'relationships') {
             title.innerText = "BEZIEHUNGEN";
             content.innerHTML = "";
 
@@ -409,13 +453,13 @@
             });
         }
 
-        // 2. AKTIVITÄTEN SCREEN (Exakt wie Bild 1, 2, 3, 4, 6)
+        // 3. AKTIVITÄTEN SCREEN
         else if (type === 'activities') {
             title.innerText = "AKTIVITÄTEN";
             content.innerHTML = `
                 <div class="bitlife-divider">Favoriten</div>
-                ${createActItem('❤️', 'Liebe', 'Die große Liebe suchen', 'openLove()', '❯')}
-                ${createActItem('🧘', 'Körper und Geist', 'An dir arbeiten', 'openBodyMind()', '❯')}
+                ${createActItem('❤️', 'Liebe', 'Die große Liebe suchen', '', '❯')}
+                ${createActItem('🧘', 'Körper und Geist', 'An dir arbeiten', '', '❯')}
                 ${createActItem('🐶', 'Haustiere', 'Ein Haustier anschaffen', 'addLog("Du warst im Tierheim.")', '• • •')}
                 ${createActItem('💆', 'Salon und Spa', 'Zeit für dich selbst nehmen', 'addLog("Du warst im Spa.")', '❯')}
 
@@ -424,9 +468,6 @@
                 ${createActItem('🌳', 'Outdoor-Lifestyle', 'Zeit mit Mutter Natur verbringen', '', '✦', true)}
                 ${createActItem('💎', 'Luxus Lifestyle', 'Vermögen aufbauen', '', '✦', true)}
                 ${createActItem('🦁', 'Zoo', 'Einen Zoo kaufen', '', '✦', true)}
-                ${createActItem('🕵️', 'Geheimagent', 'Gründe deine eigene Spionageagentur', '', '✦', true)}
-                ${createActItem('🕶️', 'Schwarzmarkt', 'Kaufe Schmuggelware', '', '✦', true)}
-                ${createActItem('🕯️', 'Kommune', 'Gründe einen Kult', '', '✦', true)}
 
                 <div class="bitlife-divider">Alle</div>
                 ${createActItem('👒', 'Accessoires', 'Lege dir coole Accessoires an', '', '❯')}
@@ -435,24 +476,8 @@
                 ${createActItem('👺', 'Kriminalität', 'Ein Verbrechen begehen', '', '❯')}
                 ${createActItem('👨‍⚕️', 'Doktor', 'Zum Arzt gehen', '', '❯')}
                 ${createActItem('🌐', 'Emigrieren', 'In ein anderes Land auswandern', '', '• • •')}
-                ${createActItem('🧬', 'Fruchtbarkeit', 'Eine Fruchtbarkeitsklinik aufsuchen', '', '❯')}
-                ${createActItem('🏇', 'Pferderennen', 'Zum Pferderennen gehen', '', '• • •')}
-                ${createActItem('👤', 'Identität', 'Deine Identität definieren', '', '❯')}
-                ${createActItem('⚖️', 'Gerichtsverfahren', 'Jemanden verklagen', '', '• • •')}
-                ${createActItem('🚗', 'Lizenzen', 'Deine Führer-/Flugscheine verwalten', '', '❯')}
-                ${createActItem('💰', 'Lotterie', 'Lotto spielen', '', '• • •')}
-                ${createActItem('🎭', 'Kino', 'Ins Kino gehen', '', '❯')}
-                ${createActItem('🍸', 'Nachtleben', 'In Clubs gehen', '', '• • •')}
-                ${createActItem('✂️', 'Schönheitschirurgie', 'Einer Schönheits-OP unterziehen', '', '❯')}
-                ${createActItem('🙏', 'Beten', 'Bete zu den BitLife-Entwicklern', 'addLog("Du hast zu den Entwicklern gebetet!")', '• • •')}
-                ${createActItem('☀️', 'Entzug', 'Deine Süchte bekämpfen', '', '❯')}
                 ${createActItem('🛍️', 'Bummeln', 'Shoppen gehen', '', '• • •')}
                 ${createActItem('👥', 'Social Media', 'Deine Online-Identität verwalten', '', '❯')}
-                ${createActItem('🎁', 'Gewinnspiel', 'Beim Gewinnspiel mitmachen', '', '• • •')}
-                ${createActItem('🌪️', 'Zeitmaschine', 'In der Zeit zurückreisen', '', '• • •')}
-                ${createActItem('🌴', 'Urlaub', 'In den Urlaub fahren', '', '❯')}
-                ${createActItem('📝', 'Letzter Wille und Testament', 'Dein Erbe verwalten', '', '• • •')}
-                ${createActItem('🦓', 'Zoobesuch', 'In den Zoo gehen', '', '• • •')}
 
                 <div style="padding: 15px;">
                     <button onclick="addLog('🏳️ Du hast dein Leben aufgegeben.'); p.alive=false; closeView(); updateUI();" style="width:100%; padding:12px; background:#00bcd4; color:white; border:none; font-weight:bold; border-radius:6px; cursor:pointer;">🏳️ Aufgeben...</button>
@@ -460,19 +485,15 @@
             `;
         }
 
-        // 3. TÄTIGKEIT SCREEN
+        // 4. TÄTIGKEIT SCREEN
         else if (type === 'job') {
             title.innerText = "TÄTIGKEIT";
             content.innerHTML = `
                 ${createActItem('🎓', 'Bildung', 'Wieder zur Schule gehen', '', '❯')}
                 ${createActItem('🧢', 'Gelegenheitsjobs', 'Schnelles Geld machen', '', '❯')}
-                ${createActItem('📞', 'Personalvermittler', 'Arbeitsvermittlung aufsuchen', '', '• • •')}
                 ${createActItem('💵', 'Jobs', 'Vollzeitjobs durchsuchen', '', '❯')}
                 ${createActItem('🛡️', 'Militär', 'Dem Militär beitreten', '', '❯')}
                 ${createActItem('🕒', 'Teilzeitjobs', 'Teilzeitjobs durchsuchen', '', '❯')}
-                ${createActItem('🎩', 'Besondere Karrieren', 'Spezielle Laufbahn einschlagen', '', '❯')}
-                <div class="bitlife-divider">Sonstiges</div>
-                ${createActItem('📓', 'Sporthistorie', 'Keine aktuelle Sporthistorie', '', '')}
             `;
         } else {
             closeView();
