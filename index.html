@@ -106,7 +106,6 @@
             color: white;
         }
         
-        /* Der große grüne Alter-Button */
         .nav-item.center {
             position: relative;
             z-index: 10;
@@ -167,6 +166,47 @@
             width: 50%;
             transition: width 0.3s ease;
         }
+
+        /* Modal Overlay für Beziehungsmenü */
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #00529b;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-title { font-size: 18px; font-weight: bold; color: #ffce00; }
+        .close-btn { background: #dc3545; border: none; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; }
+        .rel-list { overflow-y: auto; flex-grow: 1; }
+        .rel-card {
+            background: #102538;
+            border: 1px solid #1c3c5a;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .rel-info { font-weight: bold; font-size: 15px; margin-bottom: 5px; }
+        .rel-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+        .btn-rel-action {
+            background: #00529b;
+            border: none;
+            color: white;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .btn-rel-action:hover { background: #0068c4; }
     </style>
 </head>
 <body>
@@ -181,7 +221,7 @@
     <!-- Event Log -->
     <div class="log-box" id="log-box"></div>
 
-    <!-- BitLife Navigation Bar -->
+    <!-- Navigation Bar -->
     <div class="nav-bar">
         <button class="nav-item" onclick="openMenu('Beruf')">
             <div class="nav-icon">💼</div>
@@ -192,7 +232,6 @@
             Besitz
         </button>
         
-        <!-- Mittlerer großer Button -->
         <button class="nav-item center" onclick="ageUp()">
             <div class="age-btn">
                 <span class="plus">+</span>
@@ -200,7 +239,7 @@
             </div>
         </button>
 
-        <button class="nav-item" onclick="openMenu('Beziehungen')">
+        <button class="nav-item" onclick="openRelationships()">
             <div class="nav-icon">❤️</div>
             Beziehungen
         </button>
@@ -210,7 +249,7 @@
         </button>
     </div>
 
-    <!-- Stats am unteren Bildschirmrand -->
+    <!-- Stats Table -->
     <div class="stats-section">
         <div class="stat-row">
             <span class="stat-label">Glücklich:</span>
@@ -229,28 +268,75 @@
             <div class="stat-bar-bg"><div id="bar-looks" class="stat-bar-fill"></div></div>
         </div>
     </div>
+
+    <!-- Modal für Beziehungen -->
+    <div id="rel-modal" class="modal">
+        <div class="modal-header">
+            <span class="modal-title">❤️ Beziehungen</span>
+            <button class="close-btn" onclick="closeRelationships()">X</button>
+        </div>
+        <div id="rel-list" class="rel-list"></div>
+    </div>
 </div>
 
 <script>
-    // Komplett zufällige Startwerte bei der Geburt (zwischen 15% und 100%)
+    const femaleNames = ["Julia", "Sarah", "Laura", "Anna", "Lisa", "Lena", "Katharina"];
+    const maleNames = ["Michael", "Stefan", "Thomas", "Christian", "Lukas", "Felix", "David"];
+
     let p = {
         name: "Henri",
         age: 0,
         money: 0,
         status: "Kleinkind",
-        health: Math.floor(Math.random() * 85) + 15,
-        happy: Math.floor(Math.random() * 85) + 15,
-        smart: Math.floor(Math.random() * 85) + 15,
-        looks: Math.floor(Math.random() * 85) + 15,
-        alive: true
+        health: Math.floor(Math.random() * 70) + 30,
+        happy: Math.floor(Math.random() * 70) + 30,
+        smart: Math.floor(Math.random() * 70) + 30,
+        looks: Math.floor(Math.random() * 70) + 30,
+        alive: true,
+        relationships: []
     };
+
+    function initFamily() {
+        // Mutter
+        p.relationships.push({
+            id: 1,
+            role: "Mutter",
+            name: femaleNames[Math.floor(Math.random() * femaleNames.length)],
+            age: Math.floor(Math.random() * 12) + 24,
+            rel: Math.floor(Math.random() * 40) + 60,
+            alive: true
+        });
+
+        // Vater
+        p.relationships.push({
+            id: 2,
+            role: "Vater",
+            name: maleNames[Math.floor(Math.random() * maleNames.length)],
+            age: Math.floor(Math.random() * 15) + 26,
+            rel: Math.floor(Math.random() * 40) + 60,
+            alive: true
+        });
+
+        // Zufall: 0 bis 2 Geschwister
+        let sibCount = Math.floor(Math.random() * 3);
+        for(let i = 0; i < sibCount; i++) {
+            let isSister = Math.random() < 0.5;
+            p.relationships.push({
+                id: 3 + i,
+                role: isSister ? "Schwester" : "Bruder",
+                name: isSister ? femaleNames[Math.floor(Math.random() * femaleNames.length)] : maleNames[Math.floor(Math.random() * maleNames.length)],
+                age: Math.floor(Math.random() * 5) + 1,
+                rel: Math.floor(Math.random() * 50) + 50,
+                alive: true
+            });
+        }
+    }
 
     function updateUI() {
         document.getElementById('char-name').innerText = `${p.name} (Alter ${p.age})`;
         document.getElementById('char-job').innerText = p.status;
         document.getElementById('char-money').innerText = p.money + " €";
 
-        // Fortschrittsbalken unten aktualisieren
         document.getElementById('bar-happy').style.width = p.happy + "%";
         document.getElementById('bar-health').style.width = p.health + "%";
         document.getElementById('bar-smart').style.width = p.smart + "%";
@@ -267,7 +353,19 @@
 
         p.age++;
 
-        // Schul- & Alterssystem wie in BitLife
+        // Alterung der Familie
+        p.relationships.forEach(r => {
+            if (r.alive) {
+                r.age++;
+                if (r.age > 80 && Math.random() < 0.25) {
+                    r.alive = false;
+                    addLog(`🪦 Deine(e) ${r.role} ${r.name} ist im Alter von ${r.age} Jahren gestorben.`);
+                    p.happy = Math.max(0, p.happy - 30);
+                }
+            }
+        });
+
+        // Schulsystem
         if (p.age === 6) {
             p.status = "Grundschule";
             addLog("🎒 Du wurdest in der Grundschule eingeschult!");
@@ -276,17 +374,17 @@
             addLog("🏫 Du bist auf die Sekundarschule gewechselt!");
         } else if (p.age === 14) {
             p.status = "Arbeitslos";
-            addLog("🎓 Du hast deinen ersten Schulabschluss gemacht! Du kannst jetzt arbeiten gehen oder eine weiterführende Schule besuchen.");
+            addLog("🎓 Du hast deinen Schulabschluss gemacht!");
         }
 
-        // Zufallsereignisse während des Älterwerdens
+        // Zufallsevent
         let rand = Math.random();
         if (rand < 0.2) {
             p.happy = Math.min(100, p.happy + 8);
-            addLog("Du hast einen tollen Tag mit Freunden verbracht!");
+            addLog("Du hattest einen wunderschönen Tag!");
         } else if (rand < 0.35) {
             p.health = Math.max(0, p.health - 10);
-            addLog("Du hast dich erkältet (-Gesundheit).");
+            addLog("Du hast dich krank gefühlt (-Gesundheit).");
         } else {
             addLog("Ein ganz normales Jahr vergeht.");
         }
@@ -299,14 +397,80 @@
         updateUI();
     }
 
+    function openRelationships() {
+        if (!p.alive) return;
+        renderRelList();
+        document.getElementById('rel-modal').style.display = 'flex';
+    }
+
+    function closeRelationships() {
+        document.getElementById('rel-modal').style.display = 'none';
+    }
+
+    function renderRelList() {
+        const list = document.getElementById('rel-list');
+        list.innerHTML = "";
+
+        p.relationships.filter(r => r.alive).forEach(r => {
+            list.innerHTML += `
+                <div class="rel-card">
+                    <div class="rel-info">${r.role}: ${r.name} (${r.age} Jahre)</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Beziehung:</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${r.rel}%"></div></div>
+                    </div>
+                    <div class="rel-actions">
+                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'spend')">Zeit verbringen</button>
+                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'talk')">Unterhalten</button>
+                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'gift')">Geschenk (10€)</button>
+                        <button class="btn-rel-action" onclick="interactRel(${r.id}, 'insult')">Beleidigen</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function interactRel(id, type) {
+        let r = p.relationships.find(item => item.id === id);
+        if (!r) return;
+
+        if (type === 'spend') {
+            r.rel = Math.min(100, r.rel + 10);
+            p.happy = Math.min(100, p.happy + 5);
+            addLog(`Du hast tolle Zeit mit deine(r/m) ${r.role} ${r.name} verbracht.`);
+        } else if (type === 'talk') {
+            if (Math.random() < 0.7) {
+                r.rel = Math.min(100, r.rel + 5);
+                addLog(`Du hattest ein schönes Gespräch mit ${r.name}.`);
+            } else {
+                r.rel = Math.max(0, r.rel - 8);
+                addLog(`Ihr hattet eine Meinungsverschiedenheit.`);
+            }
+        } else if (type === 'gift') {
+            if (p.money >= 10) {
+                p.money -= 10;
+                r.rel = Math.min(100, r.rel + 20);
+                addLog(`Du hast ${r.name} ein Geschenk gemacht! (+Beziehung)`);
+            } else {
+                addLog("Du hast nicht genug Geld für ein Geschenk!");
+            }
+        } else if (type === 'insult') {
+            r.rel = Math.max(0, r.rel - 25);
+            p.happy = Math.max(0, p.happy - 5);
+            addLog(`Du hast ${r.name} beleidigt! (-Beziehung)`);
+        }
+
+        updateUI();
+        renderRelList();
+    }
+
     function openMenu(menuName) {
         if (!p.alive) return;
-
         if (menuName === 'Beruf') {
             if (p.age < 14) {
                 addLog("🔒 Du bist noch zu jung zum Arbeiten! Der Bereich 'Beruf' schaltet sich erst ab 14 Jahren frei.");
             } else {
-                addLog("💼 Jobbörse geöffnet: Du kannst jetzt nach Nebenjobs oder Vollzeitjobs suchen!");
+                addLog("💼 Jobbörse geöffnet.");
             }
         } else {
             addLog(`Menü "${menuName}" wurde geöffnet.`);
@@ -314,6 +478,7 @@
     }
 
     // Starten
+    initFamily();
     addLog("Du wurdest geboren!");
     updateUI();
 </script>
