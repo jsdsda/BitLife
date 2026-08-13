@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BitLife - Life Simulator</title>
+    <title>BitLife - Life Simulator (Original Style)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,7 +12,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #060e17;
+            background-color: #121212;
             color: #ffffff;
             margin: 0;
             padding: 0;
@@ -23,73 +23,84 @@
         }
         .app-container {
             width: 100%;
-            max-width: 440px;
+            max-width: 430px;
             height: 100vh;
-            max-height: 880px;
-            background-color: #0c1b2a;
+            max-height: 900px;
+            background-color: #0b1726;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            box-shadow: 0 0 35px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
-            border-radius: 12px;
         }
 
-        /* Top Header */
-        .header {
-            background-color: #06111e;
-            padding: 14px 15px;
-            text-align: center;
-            border-bottom: 3px solid #00529b;
+        /* BITLIFE ORIGINAL YELLOW HEADER */
+        .bitlife-topband {
+            background-color: #ffcc00;
+            color: #000000;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 3px solid #e6b800;
         }
-        .header h1 {
+        .bitlife-topband h1 {
             margin: 0;
             font-size: 22px;
             font-weight: 900;
-            color: #ffcc00;
-            letter-spacing: 0.5px;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
         }
-        .header-sub {
-            margin: 6px 0 0 0;
+        .bitlife-topband .subtitle {
             font-size: 13px;
-            color: #a2c4e6;
+            font-weight: 800;
+            margin-top: 2px;
+            color: #1a1a1a;
+        }
+        .bitlife-finance-bar {
+            background-color: #00529b;
+            color: #ffffff;
+            padding: 6px 16px;
             display: flex;
-            justify-content: space-around;
-            font-weight: 600;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 800;
         }
 
-        /* Log Box */
+        /* LOG BOX */
         .log-box {
             flex-grow: 1;
-            padding: 15px;
+            padding: 12px;
             overflow-y: auto;
-            background: #0c1b2a;
+            background: #0b1726;
             display: flex;
             flex-direction: column-reverse;
+            gap: 8px;
         }
         .log-entry {
-            background: rgba(255, 255, 255, 0.06);
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            background: #162a45;
+            padding: 10px 14px;
+            border-radius: 8px;
             font-size: 13.5px;
-            line-height: 1.45;
-            border-left: 4px solid #ffcc00;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            line-height: 1.4;
+            border-left: 5px solid #ffcc00;
+            color: #e2e8f0;
+            font-weight: 500;
         }
-        .log-entry.bad { border-left-color: #ef4444; }
         .log-entry.good { border-left-color: #22c55e; }
+        .log-entry.bad { border-left-color: #ef4444; }
+        .log-entry.love { border-left-color: #ec4899; }
         .log-entry.crime { border-left-color: #a855f7; }
 
-        /* Middle Navigation Bar */
+        /* ORIGINAL BITLIFE BOTTOM NAVIGATION */
         .nav-bar {
             display: flex;
-            background-color: #00529b;
-            height: 75px;
+            background-color: #004077;
+            height: 70px;
             align-items: center;
             position: relative;
-            border-top: 2px solid #0066c0;
+            border-top: 2px solid #00529b;
         }
         .nav-item {
             flex: 1;
@@ -98,71 +109,69 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 11px;
-            font-weight: bold;
+            font-size: 10px;
+            font-weight: 800;
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0;
-            height: 100%;
+            text-transform: uppercase;
         }
         .nav-icon {
-            width: 36px;
-            height: 36px;
-            background-color: #00bcd4;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 3px;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-size: 20px;
+            margin-bottom: 2px;
         }
         
-        .nav-item.center { position: relative; z-index: 10; }
+        /* AGE BUTTON (ORIGINAL GREEN BITLIFE BUTTON) */
+        .age-btn-wrapper {
+            position: relative;
+            z-index: 50;
+            margin-top: -25px;
+        }
         .age-btn {
-            width: 76px;
-            height: 76px;
-            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            width: 78px;
+            height: 78px;
+            background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
             border: 4px solid #ffffff;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #000000;
+            color: #ffffff;
             font-weight: 900;
-            font-size: 13px;
-            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             cursor: pointer;
-            margin-top: -20px;
-            transition: transform 0.1s ease;
+            transition: transform 0.08s ease;
         }
         .age-btn:active { transform: scale(0.92); }
-        .age-btn .plus { font-size: 26px; line-height: 1; font-weight: 900; }
+        .age-btn .plus-icon { font-size: 22px; line-height: 1; font-weight: 900; }
+        .age-btn .age-text { font-size: 11px; letter-spacing: 0.5px; }
 
-        /* Bottom Stats Bar */
+        /* STATS SECTION */
         .stats-section {
-            background-color: #06111e;
-            padding: 12px 16px;
-            border-top: 1px solid #16293d;
+            background-color: #070e17;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-top: 1px solid #162a45;
         }
-        .stat-row { display: flex; align-items: center; margin-bottom: 7px; }
-        .stat-row:last-child { margin-bottom: 0; }
-        .stat-label { width: 95px; font-size: 12px; font-weight: 800; color: #b0cbe5; text-transform: uppercase; }
+        .stat-row { display: flex; align-items: center; }
+        .stat-label { width: 100px; font-size: 11px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
         .stat-bar-bg {
             flex-grow: 1;
-            height: 12px;
-            background-color: #122538;
-            border-radius: 6px;
+            height: 10px;
+            background-color: #1e293b;
+            border-radius: 5px;
             overflow: hidden;
-            border: 1px solid #1d3b5a;
         }
-        .stat-bar-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.4s ease; }
-        .stat-bar-fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .stat-bar-fill { height: 100%; transition: width 0.3s ease; }
+        .fill-happy { background: #eab308; }
+        .fill-health { background: #22c55e; }
+        .fill-smart { background: #3b82f6; }
+        .fill-looks { background: #ec4899; }
 
-        /* BitLife Fullscreen Views */
+        /* BITLIFE FULLSCREEN MODAL */
         .bitlife-modal {
             display: none;
             position: absolute;
@@ -173,78 +182,63 @@
             flex-direction: column;
         }
         .bitlife-header {
-            background: #00529b;
+            background: #004077;
             color: white;
-            padding: 14px 15px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .bitlife-header h2 {
             margin: 0;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 900;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
         .bitlife-close-btn {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             font-weight: bold;
             cursor: pointer;
-            font-size: 16px;
         }
+        .bitlife-menu-list { flex-grow: 1; overflow-y: auto; background: #f8fafc; }
 
-        .bitlife-menu-list { flex-grow: 1; overflow-y: auto; background: #ffffff; }
-
-        /* BitLife List Items */
         .bitlife-item {
             display: flex;
             align-items: center;
-            padding: 14px 16px;
+            padding: 12px 16px;
             border-bottom: 1px solid #e2e8f0;
             cursor: pointer;
-            color: #000;
+            background: #ffffff;
         }
         .bitlife-item:active { background: #f1f5f9; }
-        .bitlife-item-icon { font-size: 26px; margin-right: 14px; width: 34px; text-align: center; }
+        .bitlife-item-icon { font-size: 24px; margin-right: 12px; width: 30px; text-align: center; }
         .bitlife-item-text { flex-grow: 1; }
-        .bitlife-item-title { font-weight: 800; font-size: 15px; color: #00529b; }
-        .bitlife-item-sub { font-size: 12px; color: #64748b; margin-top: 2px; font-weight: 500; }
-        .bitlife-item-arrow { color: #00529b; font-weight: bold; font-size: 16px; }
+        .bitlife-item-title { font-weight: 800; font-size: 14px; color: #0f172a; }
+        .bitlife-item-sub { font-size: 12px; color: #64748b; margin-top: 1px; }
+        .bitlife-item-arrow { color: #004077; font-weight: bold; font-size: 14px; }
 
-        /* Dividers & Headers */
         .bitlife-divider {
             background: #64748b;
             color: white;
-            padding: 6px 16px;
-            font-size: 11px;
-            font-weight: 800;
+            padding: 5px 16px;
+            font-size: 10px;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
         }
 
-        /* Relationship Progress Bar */
-        .rel-bar-container {
-            width: 110px;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-        .rel-bar-fill { height: 100%; background: #22c55e; }
-
-        /* Choice Overlay Dialogs (Echte BitLife Entscheidungspopups) */
+        /* POPUP CHOICE OVERLAY */
         .choice-overlay {
             display: none;
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 300;
             justify-content: center;
             align-items: center;
@@ -254,113 +248,106 @@
             background: #ffffff;
             color: #000000;
             width: 100%;
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .choice-icon { font-size: 45px; margin-bottom: 10px; }
-        .choice-title { font-size: 20px; font-weight: 900; color: #00529b; margin-bottom: 10px; }
-        .choice-desc { font-size: 14px; color: #334155; margin-bottom: 20px; line-height: 1.4; }
+        .choice-icon { font-size: 40px; margin-bottom: 8px; }
+        .choice-title { font-size: 18px; font-weight: 900; color: #004077; margin-bottom: 8px; }
+        .choice-desc { font-size: 13.5px; color: #334155; margin-bottom: 18px; line-height: 1.4; }
         .choice-option-btn {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             margin-bottom: 8px;
-            background: #00529b;
+            background: #004077;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13.5px;
             cursor: pointer;
         }
         .choice-option-btn:last-child { margin-bottom: 0; }
         .choice-option-btn.danger { background: #ef4444; }
         .choice-option-btn.secondary { background: #64748b; }
+        .choice-option-btn.success { background: #22c55e; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Header -->
-    <div class="header">
-        <h1 id="char-name">Sariyah Daher 🏀</h1>
-        <div class="header-sub">
-            <span>Alter: <span id="char-age">14</span></span>
-            <span>Guthaben: <span id="char-money">0 $</span></span>
-        </div>
-        <div class="header-sub" style="margin-top: 4px; color: #ffce00;">
-            <span id="char-job">Schüler</span>
-        </div>
+    <!-- BITLIFE TOPBAR -->
+    <div class="bitlife-topband">
+        <h1 id="char-name">Sariyah Daher</h1>
+        <div class="subtitle" id="char-job">Schüler</div>
+    </div>
+    <div class="bitlife-finance-bar">
+        <span>ALTER: <strong id="char-age">14</strong></span>
+        <span>BANK: <strong id="char-money">500 $</strong></span>
     </div>
 
-    <!-- Event Log -->
+    <!-- MAIN EVENT LOG -->
     <div class="log-box" id="log-box"></div>
 
-    <!-- Navigation Bar -->
+    <!-- BITLIFE NAVIGATION -->
     <div class="nav-bar">
         <button class="nav-item" onclick="openView('job')">
             <div class="nav-icon">💼</div>
             Karriere
         </button>
         <button class="nav-item" onclick="openView('assets')">
-            <div class="nav-icon">💰</div>
+            <div class="nav-icon">🏠</div>
             Besitz
         </button>
         
-        <button class="nav-item center" onclick="ageUp()">
-            <div class="age-btn">
-                <span class="plus">+</span>
-                <span>ALTER</span>
-            </div>
-        </button>
+        <div class="age-btn-wrapper">
+            <button class="age-btn" onclick="ageUp()">
+                <span class="plus-icon">+</span>
+                <span class="age-text">AGE</span>
+            </button>
+        </div>
 
         <button class="nav-item" onclick="openView('relationships')">
             <div class="nav-icon">❤️</div>
             Kontakte
         </button>
         <button class="nav-item" onclick="openView('activities')">
-            <div class="nav-icon">•••</div>
+            <div class="nav-icon">🎬</div>
             Aktivitäten
         </button>
     </div>
 
-    <!-- Stats Bar -->
+    <!-- BITLIFE STATS BARS -->
     <div class="stats-section">
         <div class="stat-row">
             <span class="stat-label">Glück</span>
-            <div class="stat-bar-bg"><div id="bar-happy" class="stat-bar-fill"></div></div>
+            <div class="stat-bar-bg"><div id="bar-happy" class="stat-bar-fill fill-happy"></div></div>
         </div>
         <div class="stat-row">
             <span class="stat-label">Gesundheit</span>
-            <div class="stat-bar-bg"><div id="bar-health" class="stat-bar-fill"></div></div>
+            <div class="stat-bar-bg"><div id="bar-health" class="stat-bar-fill fill-health"></div></div>
         </div>
         <div class="stat-row">
-            <span class="stat-label">Smart</span>
-            <div class="stat-bar-bg"><div id="bar-smart" class="stat-bar-fill"></div></div>
+            <span class="stat-label">Smartness</span>
+            <div class="stat-bar-bg"><div id="bar-smart" class="stat-bar-fill fill-smart"></div></div>
         </div>
         <div class="stat-row">
             <span class="stat-label">Aussehen</span>
-            <div class="stat-bar-bg"><div id="bar-looks" class="stat-bar-fill"></div></div>
+            <div class="stat-bar-bg"><div id="bar-looks" class="stat-bar-fill fill-looks"></div></div>
         </div>
     </div>
 
-    <!-- Universal BitLife Menu Overlay -->
+    <!-- MODALS & POPUPS -->
     <div id="bitlife-modal" class="bitlife-modal">
         <div class="bitlife-header">
             <button class="bitlife-close-btn" onclick="closeView()">✕</button>
             <h2 id="bitlife-title">MENÜ</h2>
-            <div style="width:32px;"></div>
+            <div style="width:30px;"></div>
         </div>
         <div class="bitlife-menu-list" id="bitlife-content"></div>
     </div>
 
-    <!-- Universal BitLife Choice Popup -->
     <div id="choice-overlay" class="choice-overlay">
         <div class="choice-card">
             <div id="choice-icon" class="choice-icon">❓</div>
@@ -372,76 +359,67 @@
 </div>
 
 <script>
-    // --- SPIELER DATEN ---
     let p = {
         name: "Sariyah Daher",
         age: 14,
-        money: 0,
+        money: 500,
         status: "Schüler",
         job: "Arbeitslos",
         salary: 0,
-        health: 85,
-        happy: 75,
-        smart: 80,
+        happy: 80,
+        health: 90,
+        smart: 75,
         looks: 70,
         alive: true,
         inJail: false,
         jailYears: 0,
-        disease: null,
-        pets: [],
+        partner: null,
+        houses: [],
+        cars: [],
         relationships: [
-            { id: 1, cat: "Eltern", name: "Yamila Daher", role: "Mutter", rel: 90, alive: true },
-            { id: 2, cat: "Eltern", name: "Aladdin Antoun", role: "Stiefvater", rel: 65, alive: true },
-            { id: 3, cat: "Geschwister", name: "Saladin Antoun", role: "Halb-Bruder", rel: 55, alive: true },
-            { id: 4, cat: "Freunde", name: "Adham Baba", role: "Bester Freund", rel: 80, alive: true }
+            { id: 1, cat: "Eltern", name: "Yamila Daher", role: "Mutter", age: 42, rel: 90 },
+            { id: 2, cat: "Eltern", name: "Aladdin Antoun", role: "Stiefvater", age: 45, rel: 65 },
+            { id: 3, cat: "Geschwister", name: "Saladin Antoun", role: "Halb-Bruder", age: 10, rel: 60 },
+            { id: 4, cat: "Freunde", name: "Adham Baba", role: "Bester Freund", age: 14, rel: 85 }
         ]
     };
 
+    let nextRelId = 10;
+
     const jobsList = [
-        { title: "Fast-Food-Mitarbeiter/in", salary: 16000, reqSmart: 10 },
-        { title: "Kellner / Kellnerin", salary: 21000, reqSmart: 20 },
-        { title: "Büroassistent/in", salary: 32000, reqSmart: 45 },
-        { title: "Informatiker/in", salary: 68000, reqSmart: 70 },
-        { title: "Feuerwehrmann/-frau", salary: 52000, reqSmart: 50 },
-        { title: "Unternehmensberater/in", salary: 95000, reqSmart: 85 }
+        { title: "Fast-Food-Mitarbeiter/in", salary: 18000, reqSmart: 10 },
+        { title: "Büroassistent/in", salary: 34000, reqSmart: 40 },
+        { title: "Software-Entwickler/in", salary: 72000, reqSmart: 70 },
+        { title: "Arzt / Ärztin", salary: 145000, reqSmart: 90 }
     ];
 
-    const petShopList = [
-        { type: "Hund", breed: "Golden Retriever", price: 800, health: 90, happy: 95 },
-        { type: "Hund", breed: "Mops", price: 500, health: 70, happy: 80 },
-        { type: "Katze", breed: "Perserkatze", price: 400, health: 85, happy: 60 }
+    const houseShopList = [
+        { type: "Eigentumswohnung", price: 95000, upkeep: 1000 },
+        { type: "Einfamilienhaus", price: 320000, upkeep: 3500 },
+        { type: "Luxusvilla", price: 1100000, upkeep: 12000 }
     ];
 
-    // --- UI UPDATES ---
+    const carShopList = [
+        { brand: "Gebrauchter Kleinwagen", price: 4000 },
+        { brand: "Sportwagen", price: 75000 }
+    ];
+
     function updateUI() {
-        document.getElementById('char-name').innerText = `${p.name} 🏀`;
+        document.getElementById('char-name').innerText = p.name;
         document.getElementById('char-age').innerText = p.age;
         document.getElementById('char-money').innerText = p.money.toLocaleString() + " $";
-        
-        let displayJob = p.inJail ? "🔒 Im Gefängnis" : (p.job !== "Arbeitslos" ? p.job : p.status);
-        document.getElementById('char-job').innerText = displayJob;
+        document.getElementById('char-job').innerText = p.inJail ? "🔒 Im Gefängnis" : (p.job !== "Arbeitslos" ? p.job : p.status);
 
-        updateBar('bar-happy', p.happy);
-        updateBar('bar-health', p.health);
-        updateBar('bar-smart', p.smart);
-        updateBar('bar-looks', p.looks);
-    }
-
-    function updateBar(id, val) {
-        const el = document.getElementById(id);
-        el.style.width = Math.max(0, Math.min(100, val)) + "%";
-        if (val < 30) el.classList.add('low');
-        else el.classList.remove('low');
+        document.getElementById('bar-happy').style.width = p.happy + "%";
+        document.getElementById('bar-health').style.width = p.health + "%";
+        document.getElementById('bar-smart').style.width = p.smart + "%";
+        document.getElementById('bar-looks').style.width = p.looks + "%";
     }
 
     function addLog(text, type = "normal") {
         const box = document.getElementById('log-box');
-        let cssClass = "log-entry";
-        if (type === "good") cssClass += " good";
-        if (type === "bad") cssClass += " bad";
-        if (type === "crime") cssClass += " crime";
-
-        box.innerHTML = `<div class="${cssClass}"><strong>Alter ${p.age}:</strong> ${text}</div>` + box.innerHTML;
+        let cssClass = "log-entry " + type;
+        box.innerHTML = `<div class="${cssClass}"><strong>Age ${p.age}:</strong> ${text}</div>` + box.innerHTML;
     }
 
     function clampStats() {
@@ -452,69 +430,37 @@
 
         if (p.health <= 0 && p.alive) {
             p.alive = false;
-            triggerChoice('💀 Gestorben', 'Du bist aufgrund schlechter Gesundheit gestorben.', [
-                { text: 'Neues Leben starten', action: () => location.reload() }
-            ]);
+            triggerChoice('💀 Gestorben', 'Du bist verstorben.', [{ text: 'Neues Leben', action: () => location.reload() }]);
         }
     }
 
-    // --- ALTERN & RANDOM EVENTS ---
     function ageUp() {
         if (!p.alive) return;
         p.age++;
+        p.relationships.forEach(r => r.age++);
 
-        // Gefängnis-Logik
         if (p.inJail) {
             p.jailYears--;
-            p.happy -= 10;
-            p.health -= 5;
             if (p.jailYears <= 0) {
                 p.inJail = false;
-                addLog("🔓 Du hast deine Gefängnisstrafe abgesessen und bist wieder frei!", "good");
+                addLog("🔓 Du bist wieder frei!", "good");
             } else {
-                addLog(`🔒 Du hast ein weiteres Jahr im Gefängnis verbracht. Noch ${p.jailYears} Jahre verbleibend.`, "bad");
+                addLog(`🔒 Noch ${p.jailYears} Jahre Haft.`, "bad");
             }
             clampStats(); updateUI(); return;
         }
 
-        // Einkommen & Schule
-        if (p.age === 18 && p.status === "Schüler") {
-            p.status = "Arbeitslos";
-            addLog("🎓 Du hast den Schulabschluss gemacht!", "good");
-        }
-        if (p.salary > 0) {
-            p.money += p.salary;
-            addLog(`💰 Du hast dein Jahresgehalt von ${p.salary.toLocaleString()} $ erhalten.`);
-        }
+        if (p.salary > 0) p.money += p.salary;
+        if (p.age === 18 && p.status === "Schüler") p.status = "Arbeitslos";
 
-        // Zufallsevents
-        let rand = Math.random();
-        if (rand < 0.15 && !p.disease) {
-            const diseases = ["Grippe", "Depression", "Rückenschmerzen", "Migräne"];
-            p.disease = diseases[Math.floor(Math.random() * diseases.length)];
-            p.health -= 20;
-            p.happy -= 15;
-            addLog(`🤒 Du bist an ${p.disease} erkrankt!`, "bad");
-        } else if (rand > 0.85) {
-            p.happy += 15;
-            addLog("🌟 Du hattest ein fantastisches Jahr und fühlst dich glücklich!", "good");
-        } else if (rand > 0.40 && rand < 0.50 && p.age >= 12) {
-            triggerRandomEvent();
-            return;
-        } else {
-            addLog("Ein weiteres Jahr vergeht.");
-        }
-
-        clampStats();
-        updateUI();
+        addLog("Ein weiteres Jahr ist vergangen.");
+        clampStats(); updateUI();
     }
 
-    // --- CHOICE MODAL SYSTEM ---
     function triggerChoice(title, desc, options, icon = "⚡") {
         document.getElementById('choice-icon').innerText = icon;
         document.getElementById('choice-title').innerText = title;
         document.getElementById('choice-desc').innerText = desc;
-        
         const container = document.getElementById('choice-options');
         container.innerHTML = "";
 
@@ -525,8 +471,7 @@
             btn.onclick = () => {
                 document.getElementById('choice-overlay').style.display = 'none';
                 opt.action();
-                clampStats();
-                updateUI();
+                clampStats(); updateUI();
             };
             container.appendChild(btn);
         });
@@ -534,139 +479,47 @@
         document.getElementById('choice-overlay').style.display = 'flex';
     }
 
-    function triggerRandomEvent() {
-        triggerChoice("Schul-Vorfall", "Ein Mitschüler beleidigt dich auf dem Pausenhof!", [
-            { text: "Ignorieren", action: () => { addLog("Du hast den Mitschüler ignoriert."); p.happy -= 5; } },
-            { text: "Zurückbeleidigen", action: () => { addLog("Du hast ihn beschimpft!"); p.happy += 5; } },
-            { text: "Verprügeln", action: () => { 
-                if(Math.random() > 0.5) {
-                    addLog("Du hast die Schlägerei gewonnen!", "good"); p.happy += 10;
-                } else {
-                    addLog("Du hast in der Schlägerei verloren...", "bad"); p.health -= 15;
-                }
-            }, style: "danger" }
-        ], "🏫");
-    }
-
-    // --- MODAL VIEWS ---
-    function closeView() {
-        document.getElementById('bitlife-modal').style.display = 'none';
-    }
+    function closeView() { document.getElementById('bitlife-modal').style.display = 'none'; }
 
     function openView(type) {
-        if (!p.alive) return;
-        if (p.inJail && type !== 'activities') {
-            alert("Im Gefängnis hast du keinen Zugriff auf diesen Bereich!");
-            return;
-        }
-
+        if (!p.alive || p.inJail) return;
         const modal = document.getElementById('bitlife-modal');
         const title = document.getElementById('bitlife-title');
         const content = document.getElementById('bitlife-content');
         modal.style.display = 'flex';
 
-        // 1. KARRIERE
         if (type === 'job') {
             title.innerText = "KARRIERE";
             content.innerHTML = `
-                <div class="bitlife-divider">Aktueller Status</div>
-                <div class="bitlife-item">
-                    <div class="bitlife-item-icon">💼</div>
-                    <div class="bitlife-item-text">
-                        <div class="bitlife-item-title">${p.job !== "Arbeitslos" ? p.job : p.status}</div>
-                        <div class="bitlife-item-sub">${p.salary > 0 ? 'Gehalt: ' + p.salary.toLocaleString() + ' $ / Jahr' : 'Kein Einkommen'}</div>
-                    </div>
-                </div>
-
-                <div class="bitlife-divider">Optionen</div>
-                ${p.status === "Schüler" ? createActItem('📚', 'Fleißig lernen', 'Verbessere deine Noten & Intelligenz', 'studyHard()', '❯') : ''}
-                ${p.job !== "Arbeitslos" ? createActItem('📈', 'Härter arbeiten', 'Bessere Chancen auf Beförderung', 'workHarder()', '❯') : ''}
-                ${createActItem('💵', 'Jobsuche', 'Finde einen neuen Vollzeitjob', 'openJobSearch()', '❯')}
+                <div class="bitlife-divider">Job</div>
+                ${createActItem('💼', 'Jobsuche', 'Vollzeitjobs finden', 'openJobSearch()')}
+                ${p.status === 'Schüler' ? createActItem('📚', 'Fleißig lernen', '+Smartness', 'study()') : ''}
             `;
-            if (p.job !== "Arbeitslos") {
-                content.innerHTML += `<div style="padding:15px;"><button onclick="quitJob()" class="choice-option-btn danger">Job kündigen</button></div>`;
-            }
-        }
-
-        // 2. BESITZ
-        else if (type === 'assets') {
-            title.innerText = "BESITZ & VERMÖGEN";
+        } else if (type === 'assets') {
+            title.innerText = "BESITZ";
             content.innerHTML = `
-                <div class="bitlife-divider">Guthaben</div>
-                <div class="bitlife-item">
-                    <div class="bitlife-item-icon">🏦</div>
-                    <div class="bitlife-item-text">
-                        <div class="bitlife-item-title">Bankkonto</div>
-                        <div class="bitlife-item-sub">Guthaben: ${p.money.toLocaleString()} $</div>
-                    </div>
-                </div>
-
-                <div class="bitlife-divider">Haustiere (${p.pets.length})</div>
-                ${p.pets.map(pet => createActItem('🐾', pet.breed, `Gesundheit: ${pet.health}%`, '', '❯')).join('')}
-                ${createActItem('🐶', 'Tierhandlung / Tierheim', 'Kaufe dir ein neues Haustier', 'openPetShop()', '❯')}
+                <div class="bitlife-divider">Märkte</div>
+                ${createActItem('🏠', 'Immobilien', 'Häuser kaufen', 'openHouses()')}
+                ${createActItem('🚗', 'Autohändler', 'Autos kaufen', 'openCars()')}
             `;
-        }
-
-        // 3. KONTAKTE
-        else if (type === 'relationships') {
+        } else if (type === 'relationships') {
             title.innerText = "BEZIEHUNGEN";
             content.innerHTML = "";
-            const categories = ["Eltern", "Geschwister", "Freunde"];
-
-            categories.forEach(cat => {
-                const items = p.relationships.filter(r => r.cat === cat);
-                if (items.length > 0) {
-                    content.innerHTML += `<div class="bitlife-divider">${cat}</div>`;
-                    items.forEach(r => {
-                        content.innerHTML += `
-                            <div class="bitlife-item" onclick="interactRel(${r.id})">
-                                <div class="bitlife-item-icon">👤</div>
-                                <div class="bitlife-item-text">
-                                    <div class="bitlife-item-title">${r.name} <span style="font-size:12px; color:#64748b;">(${r.role})</span></div>
-                                    <div style="display:flex; align-items:center; gap:8px;">
-                                        <div class="rel-bar-container">
-                                            <div class="rel-bar-fill" style="width:${r.rel}%;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bitlife-item-arrow">❯</div>
-                            </div>
-                        `;
-                    });
-                }
+            p.relationships.forEach(r => {
+                content.innerHTML += createActItem('👤', `${r.name} (${r.role})`, `Alter: ${r.age}`, `interactRel(${r.id})`);
             });
-        }
-
-        // 4. AKTIVITÄTEN
-        else if (type === 'activities') {
+        } else if (type === 'activities') {
             title.innerText = "AKTIVITÄTEN";
-            if (p.inJail) {
-                content.innerHTML = `
-                    <div class="bitlife-divider">Gefängnis-Aktivitäten</div>
-                    ${createActItem('🏋️', 'Knast-Fitness', 'Fitness im Hof machen', 'doGym()', '❯')}
-                    ${createActItem('🚨', 'Ausbruch versuchen', 'Versuche aus dem Gefängnis zu fliehen', 'escapeJail()', '❯')}
-                `;
-                return;
-            }
-
             content.innerHTML = `
-                <div class="bitlife-divider">Gesundheit & Geist</div>
-                ${createActItem('🏋️', 'Fitnessstudio', 'Trainieren (+Gesundheit, +Aussehen)', 'doGym()', '❯')}
-                ${createActItem('📚', 'Bibliothek', 'Bücher lesen (+Intelligenz)', 'doLibrary()', '❯')}
-                ${createActItem('👨‍⚕️', 'Arzt aufsuchen', 'Krankheiten heilen lassen', 'openDoctor()', '❯')}
-
-                <div class="bitlife-divider">Sonderaktivitäten</div>
-                ${createActItem('👺', 'Kriminalität', 'Verbrechen begehen (Geld machen)', 'openCrime()', '❯')}
-                ${createActItem('🛍️', 'Bummeln', 'Shoppen gehen (+Glück)', 'doShopping()', '❯')}
-
-                <div style="padding: 15px;">
-                    <button onclick="surrenderLife()" class="choice-option-btn danger">🏳️ Aufgeben (Leben beenden)</button>
-                </div>
+                <div class="bitlife-divider">Freizeit</div>
+                ${createActItem('🏋️', 'Gym', '+Gesundheit, +Aussehen', 'doGym()')}
+                ${createActItem('🎰', 'Casino', 'Blackjack spielen', 'openCasino()')}
+                ${createActItem('👺', 'Kriminalität', 'Verbrechen begehen', 'doCrime()')}
             `;
         }
     }
 
-    function createActItem(icon, title, sub, action, arrow) {
+    function createActItem(icon, title, sub, action) {
         return `
             <div class="bitlife-item" onclick="${action}">
                 <div class="bitlife-item-icon">${icon}</div>
@@ -674,223 +527,58 @@
                     <div class="bitlife-item-title">${title}</div>
                     <div class="bitlife-item-sub">${sub}</div>
                 </div>
-                <div class="bitlife-item-arrow">${arrow}</div>
+                <div class="bitlife-item-arrow">❯</div>
             </div>
         `;
     }
 
-    // --- GEFÄNGNIS & KRIMINALITÄT ---
-    function openCrime() {
-        triggerChoice("Kriminalität", "Welches Verbrechen möchtest du begehen?", [
-            { text: "Taschendiebstahl", action: () => commitCrime('pocket') },
-            { text: "Auto stehlen", action: () => commitCrime('car') },
-            { text: "Banküberfall", action: () => commitCrime('bank'), style: "danger" },
-            { text: "Abbrechen", action: () => {}, style: "secondary" }
-        ], "👺");
-    }
-
-    function commitCrime(type) {
-        closeView();
-        let chance = Math.random();
-
-        if (type === 'pocket') {
-            if (chance > 0.3) {
-                let gain = Math.floor(Math.random() * 100) + 30;
-                p.money += gain;
-                addLog(`👺 Du hast erfolgreich eine Geldbörse gestohlen (+${gain} $)!`, "crime");
-            } else {
-                arrest(2, "Taschendiebstahl");
-            }
-        } else if (type === 'car') {
-            if (chance > 0.6) {
-                let gain = Math.floor(Math.random() * 4000) + 1500;
-                p.money += gain;
-                addLog(`🚗 Du hast ein Auto gestohlen und verkauft (+${gain} $)!`, "crime");
-            } else {
-                arrest(5, "Autodiebstahl");
-            }
-        } else if (type === 'bank') {
-            if (chance > 0.85) {
-                let gain = Math.floor(Math.random() * 30000) + 10000;
-                p.money += gain;
-                addLog(`🏦 Unfassbar! Der Banküberfall war erfolgreich (+${gain} $)!`, "crime");
-            } else {
-                arrest(10, "Bewaffneter Banküberfall");
-            }
-        }
-    }
-
-    function arrest(years, crimeName) {
-        triggerChoice("🚨 FESTGENOMMEN!", `Die Polizei hat dich wegen ${crimeName} erwischt! Du wurdest zu ${years} Jahren Gefängnis verurteilt!`, [
-            { text: "Strafe akzeptieren", action: () => {
-                p.inJail = true;
-                p.jailYears = years;
-                p.job = "Arbeitslos";
-                p.salary = 0;
-                addLog(`🚨 Du wurdest wegen ${crimeName} zu ${years} Jahren Haft verurteilt!`, "bad");
-            }, style: "danger" }
-        ], "🚔");
-    }
-
-    function escapeJail() {
-        closeView();
-        if (Math.random() > 0.7) {
-            p.inJail = false;
-            p.jailYears = 0;
-            addLog("🏃 KINOREIF! Du bist erfolgreich aus dem Gefängnis geflohen!", "good");
-        } else {
-            p.jailYears += 2;
-            addLog("🚨 Dein Ausbruchsversuch ist gescheitert! Deine Strafe wurde um 2 Jahre erhöht.", "bad");
-        }
-        clampStats(); updateUI();
-    }
-
-    // --- ARZT & GESUNDHEIT ---
-    function openDoctor() {
-        let desc = p.disease ? `Du leidest an: ${p.disease}` : "Du hast keine bekannten Krankheiten.";
-        triggerChoice("🩺 Arztbesuch", desc, [
-            { text: "Behandeln lassen (100 $)", action: () => {
-                if (p.money < 100) { alert("Nicht genug Geld!"); return; }
-                p.money -= 100;
-                if (p.disease) {
-                    if (Math.random() > 0.25) {
-                        addLog(`🩺 Der Arzt hat deine ${p.disease} geheilt!`, "good");
-                        p.disease = null;
-                        p.health += 25;
-                    } else {
-                        addLog(`🩺 Die Behandlung für ${p.disease} schlug fehl.`, "bad");
-                    }
-                } else {
-                    p.health += 10;
-                    addLog("🩺 Der Arzt hat dich durchgecheckt. Du bist kerngesund!");
-                }
-            }},
-            { text: "Verlassen", action: () => {}, style: "secondary" }
-        ], "👨‍⚕️");
-    }
-
-    // --- HAUSTIERE ---
-    function openPetShop() {
-        const content = document.getElementById('bitlife-content');
-        content.innerHTML = `<div class="bitlife-divider">Verfügbare Tiere</div>`;
-        petShopList.forEach((pet, index) => {
-            content.innerHTML += createActItem('🐾', `${pet.breed} (${pet.type})`, `Preis: ${pet.price} $`, `buyPet(${index})`, 'Kaufen');
-        });
-    }
-
-    function buyPet(index) {
-        let pet = petShopList[index];
-        if (p.money < pet.price) {
-            alert("Du hast nicht genug Geld!");
-            return;
-        }
-        p.money -= pet.price;
-        p.pets.push(pet);
-        p.happy += 15;
-        addLog(`🐶 Du hast dir einen ${pet.breed} gekauft!`, "good");
-        closeView(); updateUI();
-    }
-
-    // --- JOBS & SCHULE ---
     function openJobSearch() {
-        if (p.age < 18) {
-            alert("Du musst mindestens 18 Jahre alt sein!");
-            return;
-        }
         const content = document.getElementById('bitlife-content');
-        content.innerHTML = `<div class="bitlife-divider">Stellenangebote</div>`;
-        jobsList.forEach((job, index) => {
-            content.innerHTML += createActItem('💼', job.title, `Gehalt: ${job.salary.toLocaleString()} $ / Jahr`, `applyJob(${index})`, 'Bewerben');
+        content.innerHTML = `<div class="bitlife-divider">Jobs</div>`;
+        jobsList.forEach((j, i) => {
+            content.innerHTML += createActItem('💼', j.title, `${j.salary.toLocaleString()} $ / Jahr`, `applyJob(${i})`);
         });
     }
 
-    function applyJob(index) {
-        let job = jobsList[index];
-        if (p.smart >= job.reqSmart) {
-            p.job = job.title;
-            p.salary = job.salary;
-            addLog(`🎉 Du hast den Job als ${job.title} bekommen!`, "good");
+    function applyJob(i) {
+        let j = jobsList[i];
+        if (p.smart >= j.reqSmart) {
+            p.job = j.title; p.salary = j.salary;
+            addLog(`🎉 Du arbeitest jetzt als ${j.title}!`, "good");
         } else {
-            addLog(`❌ Absage als ${job.title} (Zu wenig Intelligenz).`, "bad");
+            addLog(`❌ Absage als ${j.title}.`, "bad");
         }
         closeView(); updateUI();
     }
 
-    function studyHard() {
-        p.smart += 6;
-        addLog("📚 Du hast in der Schule extra hart gelernt!");
-        closeView(); clampStats(); updateUI();
+    function study() { p.smart += 5; addLog("📚 Fleißig gelernt."); closeView(); updateUI(); }
+    function doGym() { p.health += 5; p.looks += 3; addLog("🏋️ Trainiert."); closeView(); updateUI(); }
+
+    function openCasino() {
+        closeView();
+        triggerChoice("🎰 Casino", "Setze 100 $ beim Blackjack", [
+            { text: "Spielen (100 $)", action: () => {
+                p.money -= 100;
+                if (Math.random() > 0.4) { p.money += 200; addLog("🎰 200 $ gewonnen!", "good"); }
+                else addLog("🎰 Verloren!", "bad");
+            }},
+            { text: "Abbrechen", action: () => {}, style: "secondary" }
+        ]);
     }
 
-    function workHarder() {
-        p.happy -= 5;
-        addLog("💼 Du hast Überstunden gemacht, um deinen Chef zu beeindrucken.");
-        closeView(); clampStats(); updateUI();
-    }
-
-    function quitJob() {
-        addLog(`Du hast deinen Job als ${p.job} gekündigt.`);
-        p.job = "Arbeitslos";
-        p.salary = 0;
-        closeView(); updateUI();
-    }
-
-    // --- SONSTIGE AKTIVITÄTEN ---
-    function doGym() {
-        p.health += 8;
-        p.looks += 4;
-        addLog("🏋️ Du warst im Fitnessstudio trainieren.");
-        closeView(); clampStats(); updateUI();
-    }
-
-    function doLibrary() {
-        p.smart += 6;
-        addLog("📚 Du hast ein paar lehrreiche Bücher gelesen.");
-        closeView(); clampStats(); updateUI();
-    }
-
-    function doShopping() {
-        if (p.money < 50) { alert("Du brauchst mindestens 50 $!"); return; }
-        p.money -= 50;
-        p.happy += 10;
-        addLog("🛍️ Du hast dir ein paar neue Sachen gekauft.");
-        closeView(); clampStats(); updateUI();
+    function doCrime() {
+        closeView();
+        if (Math.random() > 0.5) { p.money += 150; addLog("👺 Diebstahl gelungen!", "crime"); }
+        else { p.inJail = true; p.jailYears = 3; addLog("🚨 Festgenommen! 3 Jahre Gefängnis.", "bad"); }
     }
 
     function interactRel(id) {
-        let r = p.relationships.find(item => item.id === id);
-        if (r) {
-            triggerChoice(r.name, `Was möchtest du mit deinem/deiner ${r.role} machen?`, [
-                { text: "Zeit verbringen", action: () => {
-                    r.rel = Math.min(100, r.rel + 12);
-                    p.happy += 6;
-                    addLog(`Du hast eine tolle Zeit mit ${r.name} verbracht.`);
-                }},
-                { text: "Kompliment machen", action: () => {
-                    r.rel = Math.min(100, r.rel + 8);
-                    addLog(`Du hast ${r.name} ein nettes Kompliment gemacht.`);
-                }},
-                { text: "Streit anfangen", action: () => {
-                    r.rel = Math.max(0, r.rel - 20);
-                    p.happy -= 10;
-                    addLog(`Du hast dich heftig mit ${r.name} gestritten!`, "bad");
-                }, style: "danger" }
-            ], "👤");
-        }
+        let r = p.relationships.find(x => x.id === id);
+        triggerChoice(r.name, `Aktion mit ${r.name}:`, [
+            { text: "Zeit verbringen", action: () => { p.happy += 5; addLog(`Zeit verbracht mit ${r.name}.`); }}
+        ]);
     }
 
-    function surrenderLife() {
-        triggerChoice("Leben begeben?", "Möchtest du dieses Leben wirklich aufgeben?", [
-            { text: "Ja, Leben beenden", action: () => {
-                p.alive = false;
-                addLog("🏳️ Du hast dein Leben aufgegeben.");
-                closeView(); updateUI();
-            }, style: "danger" },
-            { text: "Nein, weiterleben", action: () => {}, style: "secondary" }
-        ], "🏳️");
-    }
-
-    // Init App
     addLog("Du bist als Sariyah Daher geboren.");
     updateUI();
 </script>
