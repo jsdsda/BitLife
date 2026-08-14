@@ -357,6 +357,7 @@
     let p = {
         name: "Henri Daher",
         age: 14,
+        country: "Deutschland",
         money: 500,
         debt: 0,
         status: "Schüler",
@@ -367,6 +368,8 @@
         job: "Arbeitslos",
         jobPerformance: 50,
         salary: 0,
+        partTimeJob: null,
+        partTimeSalary: 0,
         yearsInJob: 0,
         happy: 85,
         health: 90,
@@ -401,7 +404,7 @@
         },
         
         // MAFIA & CRIME
-        mafiaRank: "Zivilist", // "Handlanger", "Soldat", "Capo", "Underboss", "Godfather"
+        mafiaRank: "Zivilist",
         mafiaSyndicate: null,
         criminalRecord: [],
 
@@ -414,30 +417,50 @@
         ]
     };
 
-    let nextRelId = 500;
-
     // --- DATA TABLES ---
+    const partTimeJobsList = [
+        { title: "🐶 Hundesitter", salary: 3200, reqAge: 13 },
+        { title: "📰 Zeitungsausträger", salary: 4100, reqAge: 13 },
+        { title: "📚 Nachhilfelehrer", salary: 6500, reqAge: 15 },
+        { title: "☕ Barista (Aushilfe)", salary: 8400, reqAge: 16 },
+        { title: "🍔 Fast-Food Kassenkraft", salary: 9200, reqAge: 16 },
+        { title: "🚲 Lieferando-Fahrer", salary: 11000, reqAge: 17 }
+    ];
+
     const jobsList = [
-        { title: "Fast-Food-Mitarbeiter/in", salary: 18000, reqSmart: 10, reqDegree: null },
-        { title: "Büroassistent/in", salary: 34000, reqSmart: 30, reqDegree: null },
-        { title: "Junior Software-Entwickler/in", salary: 72000, reqSmart: 65, reqDegree: "Informatik" },
-        { title: "Senior Software Engineer", salary: 125000, reqSmart: 75, reqDegree: "Informatik" },
-        { title: "Anwalt / Anwältin", salary: 110000, reqSmart: 80, reqDegree: "Jura" },
-        { title: "Assistenzarzt / Ärztin", salary: 98000, reqSmart: 85, reqDegree: "Medizin" },
-        { title: "Chefarzt / Chefärztin", salary: 210000, reqSmart: 90, reqDegree: "Medizin" },
-        { title: "Investmentbanker", salary: 140000, reqSmart: 85, reqDegree: "BWL" },
-        { title: "Unternehmensberater", salary: 95000, reqSmart: 75, reqDegree: "BWL" },
-        { title: "Bauingenieur/in", salary: 68000, reqSmart: 65, reqDegree: "Ingenieurwesen" },
-        { title: "Grafikdesigner/in", salary: 42000, reqSmart: 40, reqDegree: "Kunst" }
+        // Einsteiger & Service
+        { title: "☕ Barista", salary: 24000, reqSmart: 10, reqLooks: 0, reqDegree: null },
+        { title: "🚕 Taxifahrer/in", salary: 31000, reqSmart: 20, reqLooks: 0, reqDegree: null, reqLicense: true },
+        { title: "📋 Büroassistent/in", salary: 36000, reqSmart: 35, reqLooks: 0, reqDegree: null },
+        { title: "👮 Polizeibeamter/in", salary: 48000, reqSmart: 50, reqLooks: 0, reqDegree: null },
+        { title: "🏫 Grundschullehrer/in", salary: 52000, reqSmart: 60, reqLooks: 0, reqDegree: "Pädagogik" },
+
+        // Tech & Business
+        { title: "💻 Junior Software-Entwickler", salary: 72000, reqSmart: 65, reqLooks: 0, reqDegree: "Informatik" },
+        { title: "🚀 Senior Software Engineer", salary: 128000, reqSmart: 78, reqLooks: 0, reqDegree: "Informatik" },
+        { title: "📈 Investmentbanker", salary: 145000, reqSmart: 85, reqLooks: 0, reqDegree: "BWL" },
+        { title: "👔 Unternehmensberater", salary: 98000, reqSmart: 75, reqLooks: 0, reqDegree: "BWL" },
+
+        // Medizin & Recht
+        { title: "⚖️ Anwalt / Anwältin", salary: 115000, reqSmart: 82, reqLooks: 0, reqDegree: "Jura" },
+        { title: "👩‍⚖️ Richter/in", salary: 165000, reqSmart: 90, reqLooks: 0, reqDegree: "Jura" },
+        { title: "🩺 Assistenzarzt / Ärztin", salary: 102000, reqSmart: 85, reqLooks: 0, reqDegree: "Medizin" },
+        { title: "🏥 Chefarzt / Chefärztin", salary: 235000, reqSmart: 92, reqLooks: 0, reqDegree: "Medizin" },
+
+        // Spezial & High Fame
+        { title: "✈️ Verkehrsflugzeug-Pilot", salary: 140000, reqSmart: 80, reqLooks: 0, reqDegree: "Ingenieurwesen", reqLicense: true },
+        { title: "💃 Supermodel", salary: 190000, reqSmart: 20, reqLooks: 88, reqDegree: null },
+        { title: "🎬 Hollywood-Schauspieler/in", salary: 310000, reqSmart: 40, reqLooks: 80, reqDegree: "Kunst" },
+        { title: "⚽ Profi-Fußballer", salary: 450000, reqSmart: 30, reqLooks: 50, reqDegree: null }
     ];
 
     const houseShopList = [
-        { type: "Kleine Eigentumswohnung", price: 120000, upkeep: 1400, haunted: false },
-        { type: "Modernes Reihenhaus", price: 290000, upkeep: 3100, haunted: false },
-        { type: "Einfamilienhaus mit Garten", price: 480000, upkeep: 5200, haunted: false },
-        { type: "👻 Alte Spukvilla", price: 220000, upkeep: 2800, haunted: true },
-        { type: "Luxusvilla mit Infinity-Pool", price: 1850000, upkeep: 18000, haunted: false },
-        { type: "Penthousedachwohnung", price: 2400000, upkeep: 22000, haunted: false }
+        { type: "Kleine Eigentumswohnung", price: 120000, upkeep: 1400 },
+        { type: "Modernes Reihenhaus", price: 290000, upkeep: 3100 },
+        { type: "Einfamilienhaus mit Garten", price: 480000, upkeep: 5200 },
+        { type: "👻 Alte Spukvilla", price: 220000, upkeep: 2800 },
+        { type: "Luxusvilla mit Infinity-Pool", price: 1850000, upkeep: 18000 },
+        { type: "Penthousedachwohnung", price: 2400000, upkeep: 22000 }
     ];
 
     const carShopList = [
@@ -453,12 +476,10 @@
     function calculateNetWorth() {
         let houseVal = p.houses.reduce((acc, h) => acc + h.price, 0);
         let carVal = p.cars.reduce((acc, c) => acc + c.price, 0);
-        
         let stockVal = 0;
         for (let key in p.portfolio) {
             stockVal += p.portfolio[key].shares * p.portfolio[key].price;
         }
-
         let compVal = p.company ? p.company.valuation : 0;
         return (p.money - p.debt) + houseVal + carVal + stockVal + compVal;
     }
@@ -471,9 +492,14 @@
         
         let jobText = p.status;
         if (p.inJail) jobText = "🔒 Im Gefängnis";
-        else if (p.company) jobText = `👔 Gründer von ${p.company.name}`;
+        else if (p.company) jobText = `👔 CEO von ${p.company.name}`;
         else if (p.mafiaRank !== "Zivilist") jobText = `🗡️ Mafia: ${p.mafiaRank}`;
-        else if (p.job !== "Arbeitslos") jobText = p.job;
+        else if (p.job !== "Arbeitslos") {
+            jobText = p.job;
+            if (p.partTimeJob) jobText += ` (+${p.partTimeJob})`;
+        } else if (p.partTimeJob) {
+            jobText = `⏱️ ${p.partTimeJob}`;
+        }
         document.getElementById('char-job').innerText = jobText;
 
         document.getElementById('bar-happy').style.width = p.happy + "%";
@@ -497,7 +523,7 @@
         p.fame = Math.max(0, Math.min(100, p.fame));
 
         if (p.health <= 0 && p.alive) {
-            killCharacter("Gesundheitlicher Kollaps & Herzversagen");
+            killCharacter("Gesundheitlicher Kollaps");
         }
     }
 
@@ -538,13 +564,12 @@
         if (!p.alive) return;
         p.age++;
         p.relationships.forEach(r => r.age++);
-        p.children.forEach(c => c.age++);
         if (p.partner) p.partner.age++;
 
         // Schulabschluss
         if (p.age === 18 && p.status === "Schüler") {
             p.status = "Arbeitslos";
-            addLog("🎓 Du hast das Gymnasium erfolgreich abgeschlossen!", "good");
+            addLog("🎓 Du hast die Schule abgeschlossen!", "good");
         }
 
         // Alterstod Check
@@ -558,164 +583,86 @@
             p.jailYears--;
             if (p.jailYears <= 0) {
                 p.inJail = false;
-                addLog("🔓 Du hast deine Haftstrafe vollständig abgesessen!", "good");
+                addLog("🔓 Du hast deine Strafe abgesessen!", "good");
             } else {
-                addLog(`🔒 Noch ${p.jailYears} Jahre im Gefängnis zu verbleiben.`, "bad");
+                addLog(`🔒 Noch ${p.jailYears} Jahre im Gefängnis.`, "bad");
             }
             clampStats(); updateUI(); return;
         }
 
-        // 📈 BÖRSE & CRYPTO SIMULATION
+        // 📈 BÖRSE
         simulateMarkets();
 
-        // 🏢 FIRMEN-SIMULATION
-        if (p.company) {
-            simulateCompanyYear();
-        }
+        // 🏢 FIRMEN
+        if (p.company) simulateCompanyYear();
 
-        // 💰 ZINSEN & SCHULDEN
-        if (p.debt > 0) {
-            let interest = Math.floor(p.debt * 0.06);
-            p.debt += interest;
-            addLog(`📉 Zinsen auf Schulden: +${interest.toLocaleString()} $`, "bad");
-        }
-
-        // GEHALT & IMMOBILIEN
-        if (p.salary > 0) {
-            p.money += p.salary;
+        // GEHALT & NEBENJOBS
+        let totalIncome = p.salary + p.partTimeSalary;
+        if (totalIncome > 0) {
+            p.money += totalIncome;
             p.yearsInJob++;
-            
-            // Beförderungs-Chance
-            if (p.jobPerformance > 80 && Math.random() < 0.25) {
+            if (p.job !== "Arbeitslos" && p.jobPerformance > 80 && Math.random() < 0.25) {
                 let raise = Math.floor(p.salary * 0.12);
                 p.salary += raise;
-                addLog(`🎉 Beförderung & Gehaltserhöhung! Dein neues Gehalt: ${p.salary.toLocaleString()} $`, "good");
+                addLog(`🎉 Gehaltserhöhung! Neues Gehalt: ${p.salary.toLocaleString()} $`, "good");
             }
         }
 
         p.houses.forEach(h => {
-            if (p.money >= h.upkeep) {
-                p.money -= h.upkeep;
-            } else {
-                p.happy -= 8;
-                addLog(`Instandhaltungskosten für ${h.type} konnten nicht gezahlt werden!`, "bad");
-            }
+            if (p.money >= h.upkeep) p.money -= h.upkeep;
+            else { p.happy -= 8; addLog(`Kosten für ${h.type} konnten nicht gedeckt werden!`, "bad"); }
         });
 
-        // SOCIAL MEDIA SCHWUND
-        if (p.socialFollowers > 0) {
-            p.socialFollowers = Math.floor(p.socialFollowers * 0.94);
-        }
-
-        // 🎲 BITLIFE RANDOM EVENTS TRIGGER
         triggerRandomAgeEvent();
-
         addLog("Ein weiteres Lebensjahr ist vergangen.");
         clampStats(); updateUI();
     }
 
-    // --- MARKET SIMULATION ---
     function simulateMarkets() {
         let btcChange = (Math.random() - 0.47) * 0.45;
         p.portfolio.bitcoin.price = Math.max(200, Math.floor(p.portfolio.bitcoin.price * (1 + btcChange)));
-
-        let ethChange = (Math.random() - 0.46) * 0.35;
-        p.portfolio.ethereum.price = Math.max(50, Math.floor(p.portfolio.ethereum.price * (1 + ethChange)));
-
-        let techChange = (Math.random() - 0.45) * 0.18;
-        p.portfolio.techCorp.price = Math.max(15, Math.floor(p.portfolio.techCorp.price * (1 + techChange)));
-
-        if (btcChange > 0.3) addLog("🚀 Bitcoin erlebt eine historische Explosion!", "crypto");
-        if (btcChange < -0.3) addLog("💥 Riesen-Crash auf dem Kryptomarkt!", "bad");
     }
 
-    // --- FIRMEN SIMULATION ---
     function simulateCompanyYear() {
         let c = p.company;
-        let marketFactor = Math.random() * 0.5 - 0.12;
-        let netRevenue = Math.floor(c.revenue * marketFactor);
-
+        let netRevenue = Math.floor(c.revenue * (Math.random() * 0.5 - 0.12));
         c.valuation = Math.max(10000, Math.floor(c.valuation + netRevenue * 1.8));
-        
         if (netRevenue > 0) {
             p.money += netRevenue;
-            addLog(`🏢 ${c.name} erwirtschaftet ${netRevenue.toLocaleString()} $ Jahresgewinn!`, "business");
-        } else {
-            addLog(`📉 ${c.name} hatte ein Verlustjahr (${netRevenue.toLocaleString()} $).`, "bad");
+            addLog(`🏢 ${c.name} erwirtschaftet ${netRevenue.toLocaleString()} $ Gewinn!`, "business");
         }
     }
 
-    // --- BITLIFE RANDOM EVENTS ---
     function triggerRandomAgeEvent() {
         let rand = Math.random();
-
-        if (rand < 0.08) {
-            triggerChoice(" Schulhof-Mobbing", "Ein Mitschüler macht sich öffentlich über deine Kleidung lustig. Wie reagierst du?", [
-                { text: "Ihn ignorieren", action: () => { p.happy -= 5; addLog("Du hast das Mobbing ignoriert."); } },
-                { text: "Verbal zurückschlagen", action: () => { p.smart += 2; addLog("Du hast ihn vor allen lächerlich gemacht!", "good"); } },
-                { text: "Ihm eine Tracht Prügel verpassen", action: () => { 
-                    if (Math.random() < 0.6) { p.happy += 10; addLog("Du hast den Mobber zusammengeschlagen!", "crime"); }
-                    else { p.health -= 20; addLog("Du hast die Schlägerei verloren.", "bad"); }
-                }, style: "danger" }
-            ], "🏫");
-        } 
-        else if (rand < 0.14) {
-            triggerChoice("💰 Erbschaft von Onkel", "Ein weit entfernter Onkel ist verstorben und hinterlässt dir Geld!", [
-                { text: "Erbe annehmen (+15.000 $)", action: () => { p.money += 15000; addLog("💰 15.000 $ Erbschaft erhalten!", "good"); } }
+        if (rand < 0.1) {
+            triggerChoice("💰 Erbschaft", "Ein Onkel hinterlässt dir Geld!", [
+                { text: "Erbe annehmen (+10.000 $)", action: () => { p.money += 10000; addLog("💰 10.000 $ geerbt!", "good"); } }
             ], "🎁");
-        }
-        else if (rand < 0.20) {
-            triggerChoice("😷 Unerwartete Krankheit", "Du wachst mit starkem Fieber und Schüttelfrost auf.", [
-                { text: "Ins Bett legen", action: () => { p.health -= 10; addLog("Krankheit durchgestanden."); } },
-                { text: "Sofort zum Arzt gehen (150 $)", action: () => { 
-                    if (p.money >= 150) { p.money -= 150; p.health += 10; addLog("Arzt hat dir erfolgreich Medikamente verschrieben.", "good"); }
-                }}
-            ], "🤒");
-        }
-        else if (rand < 0.25) {
-            triggerChoice("🐕 Streunender Hund", "Ein herrenloser Hund läuft dir auf der Straße hinterher und wedelt mit dem Schwanz.", [
-                { text: "Mit nach Hause nehmen", action: () => { p.happy += 15; addLog("Du hast einen treuen Hund adoptiert! 🐶", "good"); } },
-                { text: "Weitergehen", action: () => {} }
-            ], "🐕");
-        }
-        else if (rand < 0.30 && p.age >= 18) {
-            triggerChoice("🚗 Beinahe-Unfall", "Ein Raser überholt dich gefährlich nah im Straßenverkehr!", [
-                { text: "Ruhig bleiben", action: () => { p.happy -= 2; } },
-                { text: "Hupen und Mittelfinger zeigen", action: () => { p.happy += 5; addLog("Du hast deinem Ärger Luft gemacht."); } }
-            ], "🚗");
         }
     }
 
-    // --- MAIN VIEWS LOGIC ---
+    // --- MAIN VIEWS ---
     function openView(type) {
         if (!p.alive) return;
         const modal = document.getElementById('bitlife-modal');
         const title = document.getElementById('bitlife-title');
         const content = document.getElementById('bitlife-content');
-
-        if (p.inJail) {
-            title.innerText = "GEFÄNGNIS";
-            content.innerHTML = `
-                <div class="bitlife-divider">Gefängnis-Aktionen</div>
-                ${createActItem('🏃', 'Ausbruch versuchen', 'Minispiel / Fluchtversuch', 'tryPrisonEscape()')}
-                ${createActItem('💵', 'Wärter bestechen (10.000 $)', 'Freikaufen', 'bribeGuard()')}
-                ${createActItem('🏋️', 'Hofgang & Training', '+Gesundheit', 'doGym()')}
-            `;
-            modal.style.display = 'flex'; return;
-        }
-
         modal.style.display = 'flex';
 
         if (type === 'job') {
-            title.innerText = "KARRIERE & IMPERIUM";
+            title.innerText = "KARRIERE & JOBS";
             content.innerHTML = `
-                <div class="bitlife-divider">Unternehmen & Startup</div>
-                ${!p.company && p.age >= 18 ? createActItem('🏢', 'Firma gründen', 'Eigenes Startup starten', 'openBusinessStart()') : ''}
-                ${p.company ? createActItem('👔', `${p.company.name} verwalten`, 'F&E, Marketing & IPO', 'openCompanyManager()') : ''}
-                <div class="bitlife-divider">Ausbildung & Karriere</div>
+                <div class="bitlife-divider">Teilzeit & Nebenjobs (Ab 13 Jahren)</div>
+                ${createActItem('⏱️', 'Teilzeitjob-Börse', p.partTimeJob ? `Aktuell: ${p.partTimeJob}` : 'Sucht einen Nebenjob', 'openPartTimeSearch()')}
+                ${p.partTimeJob ? createActItem('❌', 'Teilzeitjob kündigen', '', 'quitPartTime()') : ''}
+                <div class="bitlife-divider">Vollzeit-Karriere & Studium</div>
                 ${p.age >= 18 && p.education !== 'Universität' ? createActItem('🎓', 'Universität', 'Studium beginnen', 'openUniMenu()') : ''}
-                ${createActItem('💼', 'Jobsuche', 'Offene Stellen ansehen', 'openJobSearch()')}
+                ${createActItem('💼', 'Vollzeit-Jobsuche', 'Offene Stellenangebote', 'openJobSearch()')}
                 ${p.job !== 'Arbeitslos' ? createActItem('📈', 'Hart Arbeiten', 'Leistung steigern', 'workHard()') : ''}
+                <div class="bitlife-divider">Business Empire</div>
+                ${!p.company && p.age >= 18 ? createActItem('🏢', 'Firma gründen', 'Startup starten', 'openBusinessStart()') : ''}
+                ${p.company ? createActItem('👔', `${p.company.name} verwalten`, 'Management', 'openCompanyManager()') : ''}
             `;
         } else if (type === 'assets') {
             title.innerText = "BESITZ & INVESTMENTS";
@@ -723,10 +670,8 @@
                 <div class="bitlife-divider">Börse & Crypto</div>
                 ${createActItem('📈', 'Aktien & Crypto-Trading', 'Handel mit Assets', 'openStockMarket()')}
                 <div class="bitlife-divider">Immobilien & Fahrzeuge</div>
-                ${createActItem('🏠', 'Immobilienmarkt', 'Häuser kaufen / verkaufen', 'openHouses()')}
-                ${createActItem('🚗', 'Autohändler', 'Fahrzeuge kaufen', 'openCars()')}
-                <div class="bitlife-divider">Finanzen</div>
-                ${createActItem('🏦', 'Kredit aufnehmen', 'Bankkredit (25.000 $)', 'takeBankLoan()')}
+                ${createActItem('🏠', 'Immobilienmarkt', 'Häuser kaufen', 'openHouses()')}
+                ${createActItem('🚗', 'Autohändler', 'Autos kaufen', 'openCars()')}
             `;
         } else if (type === 'relationships') {
             title.innerText = "BEZIEHUNGEN";
@@ -743,14 +688,21 @@
         } else if (type === 'activities') {
             title.innerText = "AKTIVITÄTEN";
             content.innerHTML = `
-                <div class="bitlife-divider">Social Media & Ruhm</div>
+                <div class="bitlife-divider">Gesundheit & Aussehen</div>
+                ${createActItem('🏋️', 'Fitnessstudio', 'Trainieren (+Gesundheit)', 'goGym()')}
+                ${createActItem('🧘', 'Yoga-Kurs', 'Macht entspannt (+Glück)', 'doYoga()')}
+                ${createActItem('💇', 'Friseur & Beauty', 'Neuer Style (+Aussehen)', 'doBeauty()')}
+                ${createActItem('🩺', 'Arzt besuchen', 'Krankheiten heilen (150 $)', 'visitDoctor()')}
+                <div class="bitlife-divider">Lernen & Ausbildung</div>
+                ${createActItem('🚗', 'Fahrschule', 'Führerschein machen (1.200 $)', 'takeDrivingLessons()')}
+                ${createActItem('📚', 'Bibliothek besuchen', 'Buch lesen (+Smartness)', 'goLibrary()')}
+                <div class="bitlife-divider">Freizeit & Lifestyle</div>
                 ${createActItem('📱', 'Social Media', 'Posts & Viralität', 'openSocialMedia()')}
-                <div class="bitlife-divider">Unterwelt & Mafia</div>
+                ${createActItem('🍿', 'Kino & Ausgang', 'Spaß haben (50 $)', 'goCinema()')}
+                ${createActItem('✈️', 'Auswandern', 'In neues Land ziehen', 'emigrate()')}
+                <div class="bitlife-divider">Casino & Unterwelt</div>
                 ${p.mafiaRank === 'Zivilist' ? createActItem('🗡️', 'Mafia beitreten', 'Syndikat beitreten', 'joinMafia()') : createActItem('🗡️', 'Mafia-Aktionen', 'Schutzgeld & Clankriege', 'openMafiaMenu()')}
-                <div class="bitlife-divider">Freizeit & Gesundheit</div>
-                ${createActItem('🏥', 'Arzt besuchen', 'Krankheiten heilen (150 $)', 'visitDoctor()')}
                 ${createActItem('🎰', 'Casino Blackjack', '1.000 $ setzen', 'openCasino()')}
-                ${createActItem('🎫', 'Lottoschein kaufen', 'Preis: 10 $', 'buyLotteryTicket()')}
             `;
         }
     }
@@ -768,129 +720,95 @@
         `;
     }
 
-    // --- FIRMEN LOGIK ---
-    function openBusinessStart() {
-        closeView();
-        if (p.money < 50000) { alert("Du brauchst mindestens 50.000 $ Startkapital!"); return; }
-        triggerChoice("🏢 Firmengründung", "Wähle deine Branche:", [
-            { text: "Tech-Startup (50.000 $)", action: () => startCompany("TechCorp", 50000) },
-            { text: "Automobil-Konzern (250.000 $)", action: () => startCompany("HyperMotors", 250000) },
-            { text: "Supermarkt-Kette (100.000 $)", action: () => startCompany("MegaMarkt", 100000) },
-            { text: "Abbrechen", action: () => {}, style: "secondary" }
-        ]);
+    // --- TEILZEITJOBS ---
+    function openPartTimeSearch() {
+        const content = document.getElementById('bitlife-content');
+        content.innerHTML = `<div class="bitlife-divider">Verfügbare Teilzeitjobs</div>`;
+        partTimeJobsList.forEach((j, i) => {
+            content.innerHTML += createActItem('⏱️', j.title, `${j.salary.toLocaleString()} $ / Jahr (Ab ${j.reqAge} J.)`, `applyPartTime(${i})`);
+        });
     }
 
-    function startCompany(name, cost) {
-        if (p.money >= cost) {
-            p.money -= cost;
-            p.company = { name: name, valuation: cost * 2, revenue: cost, employees: 8 };
-            addLog(`🏢 Firma ${name} gegründet!`, "business");
+    function applyPartTime(i) {
+        let j = partTimeJobsList[i];
+        if (p.age < j.reqAge) { alert(`Du musst mindestens ${j.reqAge} Jahre alt sein!`); return; }
+        p.partTimeJob = j.title;
+        p.partTimeSalary = j.salary;
+        addLog(`⏱️ Du hast den Nebenjob als ${j.title} angenommen!`, "good");
+        closeView(); updateUI();
+    }
+
+    function quitPartTime() {
+        p.partTimeJob = null;
+        p.partTimeSalary = 0;
+        addLog("Du hast deinen Nebenjob gekündigt.");
+        closeView(); updateUI();
+    }
+
+    // --- FREIZEIT & AKTIVITÄTEN ---
+    function goGym() {
+        closeView(); p.health = Math.min(100, p.health + 8); p.looks = Math.min(100, p.looks + 3);
+        addLog("🏋️ Ausgiebig im Fitnessstudio geschwitzt (+Gesundheit, +Aussehen).", "good"); updateUI();
+    }
+
+    function doYoga() {
+        closeView(); p.happy = Math.min(100, p.happy + 10); p.health = Math.min(100, p.health + 4);
+        addLog("🧘 Yoga-Einheit absolviert (+Glück).", "good"); updateUI();
+    }
+
+    function doBeauty() {
+        closeView();
+        if (p.money >= 100) {
+            p.money -= 100; p.looks = Math.min(100, p.looks + 12);
+            addLog("💇 Friseurbesuch hat dein Aussehen deutlich aufgewertet!", "good");
         } else alert("Nicht genug Geld!");
         updateUI();
     }
 
-    function openCompanyManager() {
+    function goLibrary() {
+        closeView(); p.smart = Math.min(100, p.smart + 7);
+        addLog("📚 Stundenlang in Fachbüchern geschmökert (+Smartness).", "good"); updateUI();
+    }
+
+    function goCinema() {
         closeView();
-        let c = p.company;
-        triggerChoice(c.name, `Firmenwert: ${c.valuation.toLocaleString()} $ | Umsatz: ${c.revenue.toLocaleString()} $`, [
-            { text: "In F&E investieren (25.000 $)", action: () => {
-                if (p.money >= 25000) { p.money -= 25000; c.revenue += 50000; addLog("F&E-Durchbruch erzielt!", "business"); }
-            }},
-            { text: "Marketing-Kampagne (15.000 $)", action: () => {
-                if (p.money >= 15000) { p.money -= 15000; c.revenue += 30000; addLog("Marketing erhöht den Umsatz!", "business"); }
-            }},
-            { text: "Börsengang (IPO Verkauf)", action: () => {
-                let payout = c.valuation;
-                p.money += payout; p.company = null;
-                addLog(`🎉 BÖRSENGANG! Firma für ${payout.toLocaleString()} $ verkauft!`, "good");
-            }, style: "success" },
+        if (p.money >= 50) {
+            p.money -= 50; p.happy = Math.min(100, p.happy + 15);
+            addLog("🍿 Toller Film im Kino gesehen (+Glück)!", "good");
+        } else alert("Nicht genug Geld!");
+        updateUI();
+    }
+
+    function takeDrivingLessons() {
+        closeView();
+        if (p.hasDriverLicense) { alert("Du hast bereits einen Führerschein!"); return; }
+        if (p.age < 16) { alert("Du bist noch zu jung für den Führerschein!"); return; }
+        if (p.money >= 1200) {
+            p.money -= 1200; p.hasDriverLicense = true;
+            addLog("🚗 Führerscheinprüfung auf Anhieb bestanden!", "good");
+        } else alert("Die Fahrschule kostet 1.200 $!");
+        updateUI();
+    }
+
+    function emigrate() {
+        closeView();
+        triggerChoice("✈️ Auswandern", "In welches Land möchtest du ziehen?", [
+            { text: "USA 🇺🇸 (1.500 $)", action: () => moveCountry("USA", 1500) },
+            { text: "Schweiz 🇨🇭 (2.000 $)", action: () => moveCountry("Schweiz", 2000) },
+            { text: "Japan 🇯🇵 (2.500 $)", action: () => moveCountry("Japan", 2500) },
             { text: "Abbrechen", action: () => {}, style: "secondary" }
         ]);
     }
 
-    // --- BÖRSE & CRYPTO LOGIK ---
-    function openStockMarket() {
-        closeView();
-        let btc = p.portfolio.bitcoin;
-        let eth = p.portfolio.ethereum;
-        let tech = p.portfolio.techCorp;
-
-        triggerChoice("📈 Aktien- & Cryptomarkt", `Bitcoin: ${btc.price} $ | Ethereum: ${eth.price} $ | Tech: ${tech.price} $`, [
-            { text: `1 Bitcoin kaufen (${btc.price} $)`, action: () => buyStock('bitcoin') },
-            { text: `1 Bitcoin verkaufen (Besitz: ${btc.shares})`, action: () => sellStock('bitcoin') },
-            { text: `1 Tech-Aktie kaufen (${tech.price} $)`, action: () => buyStock('techCorp') },
-            { text: "Zurück", action: () => {}, style: "secondary" }
-        ]);
-    }
-
-    function buyStock(key) {
-        let item = p.portfolio[key];
-        if (p.money >= item.price) {
-            p.money -= item.price;
-            item.shares++;
-            addLog(`1x ${key} gekauft zum Kurs von ${item.price} $`, "crypto");
-        } else alert("Nicht genug Kapital!");
+    function moveCountry(c, cost) {
+        if (p.money >= cost) {
+            p.money -= cost; p.country = c;
+            addLog(`✈️ Du bist erfolgreich nach ${c} ausgewandert!`, "good");
+        } else alert("Nicht genug Geld für den Flug!");
         updateUI();
     }
 
-    function sellStock(key) {
-        let item = p.portfolio[key];
-        if (item.shares > 0) {
-            item.shares--;
-            p.money += item.price;
-            addLog(`1x ${key} verkauft für ${item.price} $`, "crypto");
-        } else alert("Du besitzt keine Anteilsscheine!");
-        updateUI();
-    }
-
-    // --- SOCIAL MEDIA LOGIK ---
-    function openSocialMedia() {
-        closeView();
-        triggerChoice("📱 Social Media Netzwerke", `Follower: ${p.socialFollowers.toLocaleString()}`, [
-            { text: "TikTok Tanz-Video hochladen", action: () => {
-                let gains = Math.floor(Math.random() * 20000) + 1000;
-                p.socialFollowers += gains; p.fame = Math.min(100, p.fame + 6);
-                addLog(`📱 Video ging viral! +${gains.toLocaleString()} Follower.`, "good");
-            }},
-            { text: "Sponsoren-Deal annehmen", action: () => {
-                if (p.socialFollowers > 10000) {
-                    let pay = Math.floor(p.socialFollowers * 0.45);
-                    p.money += pay; addLog(`💰 Werbedeal eingebracht: +${pay.toLocaleString()} $`, "good");
-                } else alert("Du brauchst mindestens 10.000 Follower!");
-            }}
-        ]);
-    }
-
-    // --- MAFIA LOGIK ---
-    function joinMafia() {
-        closeView();
-        if (Math.random() < 0.65) {
-            p.mafiaRank = "Handlanger";
-            addLog("🗡️ Du wurdest in die Sizilianische Mafia aufgenommen!", "crime");
-        } else {
-            addLog("❌ Die Mafia hat deine Anfrage abgelehnt.", "bad");
-        }
-        updateUI();
-    }
-
-    function openMafiaMenu() {
-        closeView();
-        triggerChoice("🗡️ Mafia-Syndikat", `Rang: ${p.mafiaRank}`, [
-            { text: "Schutzgeld eintreiben", action: () => {
-                let earn = Math.floor(Math.random() * 10000) + 3000;
-                p.money += earn; addLog(`🗡️ Schutzgeld kassiert: +${earn.toLocaleString()} $`, "crime");
-            }},
-            { text: "Rivalisierenden Clan angreifen", action: () => {
-                if (Math.random() < 0.5) {
-                    p.mafiaRank = "Capo"; addLog("👑 Beförderung! Du bist jetzt Capo!", "good");
-                } else {
-                    p.health -= 35; addLog("💥 Schwer verletzt beim Bandenkrieg!", "bad");
-                }
-            }}
-        ]);
-    }
-
-    // --- STANDARD SYSTEME ---
+    // --- STANDARD JOBS & SCHULE ---
     function openUniMenu() {
         closeView();
         triggerChoice("🎓 Universität", "Studiengang wählen:", [
@@ -898,24 +816,22 @@
             { text: "Jura", action: () => enrollUni("Jura") },
             { text: "Medizin", action: () => enrollUni("Medizin") },
             { text: "BWL", action: () => enrollUni("BWL") },
+            { text: "Pädagogik", action: () => enrollUni("Pädagogik") },
             { text: "Ingenieurwesen", action: () => enrollUni("Ingenieurwesen") }
         ]);
     }
 
     function enrollUni(major) {
-        if (p.smart >= 65) {
-            p.education = "Universität";
-            p.degree = major;
-            addLog(`🎓 Erfolgreich für ${major} an der Universität eingeschrieben!`, "good");
-        } else {
-            addLog("❌ Deine Noten reichen nicht für diesen Studiengang.", "bad");
-        }
+        if (p.smart >= 60) {
+            p.education = "Universität"; p.degree = major;
+            addLog(`🎓 Für ${major} an der Universität eingeschrieben!`, "good");
+        } else addLog("❌ Deine Noten reichen leider nicht aus.", "bad");
         updateUI();
     }
 
     function openJobSearch() {
         const content = document.getElementById('bitlife-content');
-        content.innerHTML = `<div class="bitlife-divider">Offene Stellenangebote</div>`;
+        content.innerHTML = `<div class="bitlife-divider">Karriere-Angebote</div>`;
         jobsList.forEach((j, i) => {
             content.innerHTML += createActItem('💼', j.title, `${j.salary.toLocaleString()} $ / Jahr`, `applyJob(${i})`);
         });
@@ -923,26 +839,60 @@
 
     function applyJob(i) {
         let j = jobsList[i];
-        if (j.reqDegree && p.degree !== j.reqDegree) { alert(`Benötigt Abschluss in: ${j.reqDegree}`); return; }
-        if (p.smart >= j.reqSmart) {
-            p.job = j.title;
-            p.salary = j.salary;
-            addLog(`🎉 Glückwunsch! Du bist jetzt als ${j.title} eingestellt!`, "good");
-        } else {
-            addLog(`❌ Deine Bewerbung als ${j.title} wurde abgelehnt.`, "bad");
-        }
+        if (j.reqDegree && p.degree !== j.reqDegree) { alert(`Abschluss benötigt: ${j.reqDegree}`); return; }
+        if (j.reqLicense && !p.hasDriverLicense) { alert("Führerschein erforderlich!"); return; }
+        if (p.smart >= j.reqSmart && p.looks >= j.reqLooks) {
+            p.job = j.title; p.salary = j.salary;
+            addLog(`🎉 Eingestellt als ${j.title}!`, "good");
+        } else addLog(`❌ Absage für ${j.title}.`, "bad");
         closeView(); updateUI();
     }
 
     function workHard() {
         p.jobPerformance = Math.min(100, p.jobPerformance + 18);
-        addLog("💼 Überstunden gemacht und vollen Einsatz gezeigt.");
-        closeView(); updateUI();
+        addLog("💼 Fleißig gearbeitet."); closeView(); updateUI();
+    }
+
+    // --- FIRMEN & BÖRSE ---
+    function openBusinessStart() {
+        closeView();
+        if (p.money < 50000) { alert("Du brauchst mindestens 50.000 $ Startkapital!"); return; }
+        triggerChoice("🏢 Firmengründung", "Wähle deine Branche:", [
+            { text: "Tech-Startup (50.000 $)", action: () => startCompany("TechCorp", 50000) },
+            { text: "Automobil-Konzern (250.000 $)", action: () => startCompany("HyperMotors", 250000) },
+            { text: "Supermarkt-Kette (100.000 $)", action: () => startCompany("MegaMarkt", 100000) }
+        ]);
+    }
+
+    function startCompany(name, cost) {
+        if (p.money >= cost) {
+            p.money -= cost; p.company = { name: name, valuation: cost * 2, revenue: cost, employees: 8 };
+            addLog(`🏢 Firma ${name} gegründet!`, "business");
+        } else alert("Zu wenig Kapital!");
+        updateUI();
+    }
+
+    function openCompanyManager() {
+        closeView();
+        let c = p.company;
+        triggerChoice(c.name, `Firmenwert: ${c.valuation.toLocaleString()} $`, [
+            { text: "F&E Investment (25.000 $)", action: () => { if (p.money>=25000){ p.money-=25000; c.revenue+=50000; addLog("F&E Erfolg!", "business"); }} },
+            { text: "Börsengang (IPO Verkauf)", action: () => { let payout=c.valuation; p.money+=payout; p.company=null; addLog(`🎉 BÖRSENGANG! Firma für ${payout.toLocaleString()} $ verkauft!`, "good"); }, style: "success" }
+        ]);
+    }
+
+    function openStockMarket() {
+        closeView();
+        let btc = p.portfolio.bitcoin;
+        triggerChoice("📈 Börse & Crypto", `Bitcoin: ${btc.price} $`, [
+            { text: `1 Bitcoin kaufen (${btc.price} $)`, action: () => { if (p.money>=btc.price){ p.money-=btc.price; btc.shares++; addLog("Bitcoin gekauft!", "crypto"); }} },
+            { text: `1 Bitcoin verkaufen (Anzahl: ${btc.shares})`, action: () => { if (btc.shares>0){ btc.shares--; p.money+=btc.price; addLog("Bitcoin verkauft!", "crypto"); }} }
+        ]);
     }
 
     function openHouses() {
         const content = document.getElementById('bitlife-content');
-        content.innerHTML = `<div class="bitlife-divider">Immobilienmarkt</div>`;
+        content.innerHTML = `<div class="bitlife-divider">Immobilien</div>`;
         houseShopList.forEach((h, i) => {
             content.innerHTML += createActItem('🏠', h.type, `${h.price.toLocaleString()} $`, `buyHouse(${i})`);
         });
@@ -950,17 +900,14 @@
 
     function buyHouse(i) {
         let h = houseShopList[i];
-        if (p.money >= h.price) {
-            p.money -= h.price;
-            p.houses.push({...h});
-            addLog(`🏠 ${h.type} erfolgreich gekauft!`, "good");
-        } else alert("Kreditrahmen oder Bankguthaben reicht nicht aus!");
+        if (p.money >= h.price) { p.money -= h.price; p.houses.push({...h}); addLog(`🏠 ${h.type} gekauft!`, "good"); }
+        else alert("Zu wenig Geld!");
         closeView(); updateUI();
     }
 
     function openCars() {
         const content = document.getElementById('bitlife-content');
-        content.innerHTML = `<div class="bitlife-divider">Fahrzeughändler</div>`;
+        content.innerHTML = `<div class="bitlife-divider">Autos</div>`;
         carShopList.forEach((c, i) => {
             content.innerHTML += createActItem('🚗', c.brand, `${c.price.toLocaleString()} $`, `buyCar(${i})`);
         });
@@ -968,60 +915,32 @@
 
     function buyCar(i) {
         let c = carShopList[i];
-        if (p.money >= c.price) {
-            p.money -= c.price;
-            p.cars.push({...c});
-            addLog(`🚗 ${c.brand} erworben!`, "good");
-        } else alert("Nicht genug Geld!");
+        if (p.money >= c.price) { p.money -= c.price; p.cars.push({...c}); addLog(`🚗 ${c.brand} gekauft!`, "good"); }
+        else alert("Zu wenig Geld!");
         closeView(); updateUI();
     }
 
     function findPartner() {
         closeView();
-        let names = ["Clara", "Lukas", "Sophie", "Milan", "Elena", "Maximilian"];
-        let rName = names[Math.floor(Math.random() * names.length)];
-        p.partner = { name: rName, rel: 85, age: p.age };
-        addLog(`❤️ Du hast dich in ${rName} verliebt und ihr seid jetzt zusammen!`, "love");
-        updateUI();
+        p.partner = { name: "Clara", rel: 85, age: p.age };
+        addLog("❤️ Du hast eine neue Beziehung begonnen!", "love"); updateUI();
     }
 
     function interactPartner() {
-        closeView();
-        p.partner.rel = Math.min(100, p.partner.rel + 12);
-        p.happy += 8;
-        addLog(`Ein wunderschönes Date mit ${p.partner.name} verbracht.`, "love");
-        updateUI();
+        closeView(); p.partner.rel = Math.min(100, p.partner.rel + 12); p.happy += 8;
+        addLog(`Schöne Zeit mit ${p.partner.name} verbracht.`, "love"); updateUI();
     }
 
     function interactRel(id) {
-        let r = p.relationships.find(x => x.id === id);
-        closeView();
-        r.rel = Math.min(100, r.rel + 10);
-        p.happy += 5;
-        addLog(`Schöne Zeit mit ${r.name} verbracht.`);
-        updateUI();
+        let r = p.relationships.find(x => x.id === id); closeView();
+        r.rel = Math.min(100, r.rel + 10); p.happy += 5;
+        addLog(`Zeit mit ${r.name} verbracht.`); updateUI();
     }
 
     function visitDoctor() {
         closeView();
-        if (p.money >= 150) {
-            p.money -= 150;
-            p.diseases = [];
-            p.health = Math.min(100, p.health + 25);
-            addLog("🏥 Der Arzt hat dich erfolgreich durchcheckt und behandelt!", "good");
-        } else alert("Du hast keine 150 $ für die Praxisgebühr!");
-        updateUI();
-    }
-
-    function buyLotteryTicket() {
-        closeView();
-        if (p.money >= 10) {
-            p.money -= 10;
-            if (Math.random() < 0.012) {
-                p.money += 10000000;
-                addLog("🎉 UNGLAUBLICH! DU HAST DEN JACKPOT VON 10.000.000 $ GEWONNEN!", "good");
-            } else addLog("🎫 Niete gezogen.");
-        }
+        if (p.money >= 150) { p.money -= 150; p.health = Math.min(100, p.health + 25); addLog("🏥 Arzt hat dich behandelt!", "good"); }
+        else alert("Arzt kostet 150 $!");
         updateUI();
     }
 
@@ -1029,25 +948,25 @@
         closeView();
         if (p.money >= 1000) {
             p.money -= 1000;
-            if (Math.random() > 0.47) {
-                p.money += 2000;
-                addLog("🎰 Blackjack gewonnen! (+2.000 $)", "good");
-            } else addLog("🎰 1.000 $ im Casino verspielt.", "bad");
-        } alert("Einsatz: Mindestens 1.000 $ nötig!");
+            if (Math.random() > 0.47) { p.money += 2000; addLog("🎰 Blackjack gewonnen! (+2.000 $)", "good"); }
+            else addLog("🎰 Geld im Casino verspielt.", "bad");
+        } else alert("Einsatz: Mindestens 1.000 $!");
         updateUI();
     }
 
-    function takeBankLoan() {
+    function joinMafia() {
         closeView();
-        p.money += 25000;
-        p.debt += 25000;
-        addLog("🏦 Bankkredit über 25.000 $ aufgenommen.");
+        if (Math.random() < 0.65) { p.mafiaRank = "Handlanger"; addLog("🗡️ In die Mafia aufgenommen!", "crime"); }
+        else addLog("❌ Mafia hat dich abgelehnt.", "bad");
         updateUI();
     }
 
-    function tryPrisonEscape() { closeView(); p.inJail = false; addLog("🏃 Ausbruch gelungen!", "good"); updateUI(); }
-    function bribeGuard() { closeView(); p.inJail = false; addLog("💵 Wärter bestochen!", "good"); updateUI(); }
-    function doGym() { p.health = Math.min(100, p.health + 6); addLog("🏋️ Ausgiebig trainiert."); closeView(); updateUI(); }
+    function openMafiaMenu() {
+        closeView();
+        triggerChoice("🗡️ Mafia", `Rang: ${p.mafiaRank}`, [
+            { text: "Schutzgeld eintreiben", action: () => { let e = Math.floor(Math.random()*10000)+3000; p.money+=e; addLog(`Schutzgeld: +${e} $`, "crime"); }}
+        ]);
+    }
 
     addLog("Du bist als Henri Daher auf die Welt gekommen.");
     updateUI();
