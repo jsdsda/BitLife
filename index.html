@@ -253,6 +253,8 @@
             border-radius: 16px; padding: 24px; text-align: center;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 88vh;
+            overflow-y: auto;
         }
         @keyframes popIn {
             0% { transform: scale(0.8); opacity: 0; }
@@ -294,11 +296,64 @@
             width: 270px; padding: 50px 20px 30px 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.95); margin-bottom: 30px;
         }
+
+        /* --- BIRTH / CHARACTER CREATION SCREEN --- */
+        .birth-screen {
+            display: flex; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top, #1e293b 0%, #030712 70%);
+            color: white; z-index: 600;
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px; text-align: center;
+        }
+        .birth-screen h1 {
+            font-size: 30px; font-weight: 900; margin-bottom: 4px;
+            background: linear-gradient(180deg, #facc15 0%, #ca8a04 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .birth-screen p.tagline { color: #94a3b8; font-size: 13px; margin-bottom: 30px; }
+        .birth-icon { font-size: 56px; margin-bottom: 10px; }
+        .birth-input-label {
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            color: #94a3b8; align-self: flex-start; margin-bottom: 6px;
+        }
+        .birth-input {
+            width: 100%; padding: 14px 16px; border-radius: 10px; border: 2px solid #334155;
+            background: #0f172a; color: white; font-size: 15px; font-weight: 700;
+            margin-bottom: 10px; text-align: center;
+        }
+        .birth-input:focus { outline: none; border-color: #facc15; }
+        .birth-gender-row { display: flex; gap: 10px; width: 100%; margin-bottom: 22px; }
+        .birth-gender-btn {
+            flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #334155;
+            background: #0f172a; color: #94a3b8; font-weight: 800; font-size: 13px; cursor: pointer;
+        }
+        .birth-gender-btn.selected { border-color: #facc15; color: #facc15; background: #1e293b; }
+        .birth-form { width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: flex-start; }
+        .birth-error { color: #ef4444; font-size: 12px; font-weight: 700; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+
+    <!-- BIRTH / CHARACTER CREATION SCREEN -->
+    <div id="birth-screen" class="birth-screen">
+        <div class="birth-icon">👶</div>
+        <h1>NEUES LEBEN</h1>
+        <p class="tagline">Erstelle deinen Charakter und werde geboren</p>
+        <div class="birth-form">
+            <div class="birth-input-label">Vorname</div>
+            <input type="text" id="birth-name-input" class="birth-input" placeholder="z.B. Henri" maxlength="16">
+            <div class="birth-error" id="birth-error">Bitte gib einen Namen ein!</div>
+            <div class="birth-input-label" style="margin-top:6px;">Geschlecht</div>
+            <div class="birth-gender-row">
+                <button type="button" class="birth-gender-btn selected" id="gender-m-btn" onclick="selectGender('männlich')">👦 Männlich</button>
+                <button type="button" class="birth-gender-btn" id="gender-f-btn" onclick="selectGender('weiblich')">👧 Weiblich</button>
+            </div>
+            <button class="choice-option-btn success" style="width:100%;" onclick="startLife()">🎉 Geboren werden</button>
+        </div>
+    </div>
+
     <div class="bitlife-topband">
         <h1 id="char-name">Henri</h1>
         <div class="subtitle" id="char-job">Schüler (Gymnasium Stein)</div>
@@ -410,15 +465,17 @@
 <script>
     // --- 1. PLAYER STATE (DATENBANK) ---
     let p = {
-        name: "Henri",
+        name: "",
+        gender: "männlich",
         location: "Zirndorf, Bayern",
-        age: 13,
-        money: 150,
-        status: "Schüler (Gymnasium Stein)",
+        age: 0,
+        money: 50,
+        status: "Baby",
         job: "Arbeitslos",
         salary: 0,
-        
-        happy: 90, health: 95, smart: 85, looks: 80, fame: 0,
+        major: null,
+
+        happy: 90, health: 95, smart: 10, looks: 70, fame: 0,
         alive: true, inJail: false, jailYears: 0,
         
         // BEZIEHUNGEN
@@ -427,11 +484,7 @@
             { role: "Vater", name: "Papa", rel: 90 },
             { role: "Bruder", name: "Bruder", rel: 80 }
         ],
-        friends: [
-            { name: "Tim", rel: 85 },
-            { name: "Simon", rel: 85 },
-            { name: "Iris", rel: 80 }
-        ],
+        friends: [],
         partner: null,
         
         // BESITZ & FINANZEN
@@ -441,6 +494,26 @@
         socialMedia: { active: false, followers: 0, verified: false },
         propertiesRented: 0
     };
+
+    // --- 1B. CHARAKTERERSTELLUNG / GEBURT ---
+    function selectGender(g) {
+        p.gender = g;
+        document.getElementById('gender-m-btn').classList.toggle('selected', g === 'männlich');
+        document.getElementById('gender-f-btn').classList.toggle('selected', g === 'weiblich');
+    }
+
+    function startLife() {
+        let nameInput = document.getElementById('birth-name-input');
+        let name = nameInput.value.trim();
+        if (!name) {
+            document.getElementById('birth-error').style.display = 'block';
+            return;
+        }
+        p.name = name;
+        document.getElementById('birth-screen').style.display = 'none';
+        addLog(`${p.name} wurde in ${p.location} geboren! Willkommen auf der Welt.`, "good");
+        updateUI();
+    }
 
     // --- 2. HILFSFUNKTIONEN & UI ---
     function clampStats() {
@@ -458,14 +531,27 @@
         return Math.floor(val);
     }
 
+    function getLifeStage() {
+        if (p.age < 6) return "Baby / Kleinkind";
+        if (p.age < 10) return "Grundschule";
+        if (p.age < 18) return "Gymnasium Stein";
+        return "Erwachsen";
+    }
+
     function updateUI() {
         clampStats();
-        document.getElementById('char-name').innerText = p.name;
+        document.getElementById('char-name').innerText = p.name || "???";
         document.getElementById('char-age').innerText = p.age;
         document.getElementById('char-money').innerText = p.money.toLocaleString() + " $";
         document.getElementById('char-networth').innerText = calculateNetWorth().toLocaleString() + " $";
-        
-        if (p.inJail) p.status = "Im Gefängnis";
+
+        if (p.inJail) {
+            p.status = "Im Gefängnis";
+        } else if (p.age < 18 && p.job === "Arbeitslos") {
+            p.status = getLifeStage();
+        } else if (p.age >= 18 && p.job === "Arbeitslos" && p.status.indexOf("Student") === -1) {
+            p.status = "Erwachsen";
+        }
         document.getElementById('char-job').innerText = p.job !== "Arbeitslos" ? p.job : p.status;
 
         document.getElementById('bar-happy').style.width = p.happy + "%";
@@ -500,6 +586,7 @@
         {
             icon: "🚲", title: "Fahrrad-Panne",
             desc: "Dein Reifen ist platt auf dem Trail im Fürther Stadtwald.",
+            minAge: 8,
             options: [
                 { text: "Selbst flicken", action: () => { if(p.smart > 50) { addLog("Du hast den Reifen perfekt repariert!", "good"); p.smart+=2; } else { addLog("Du hast es schlimmer gemacht."); p.happy-=10; } } },
                 { text: "Papa anrufen", action: () => { addLog("Papa hat dich mit dem Auto abgeholt."); p.family[1].rel += 2; } },
@@ -509,6 +596,7 @@
         {
             icon: "💻", title: "Minecraft Server Down",
             desc: "Dein OneBlock MC Server ist abgestürzt. Was tust du?",
+            minAge: 9,
             options: [
                 { text: "Fluchen", action: () => { p.happy-=5; addLog("Du hast dich furchtbar aufgeregt."); } },
                 { text: "Werwolf Web-App programmieren", action: () => { p.smart+=10; addLog("Du hast an deinem Vercel-Projekt auf GitHub gearbeitet!", "good"); } },
@@ -518,6 +606,7 @@
         {
             icon: "🍪", title: "Back-Laune",
             desc: "Du hast Lust auf Levain-Style Cookies mit Nutella.",
+            minAge: 5,
             options: [
                 { text: "Selber backen", action: () => { addLog("Sie schmecken fantastisch!", "good"); p.happy+=15; } },
                 { text: "Einen Matcha Latte machen", action: () => { addLog("Ein leckerer Iced Matcha! Sehr erfrischend."); p.health+=5; p.happy+=5; } }
@@ -526,6 +615,7 @@
         {
             icon: "💇", title: "Haarstyling",
             desc: "Deine Dauerwelle braucht Pflege.",
+            minAge: 10,
             options: [
                 { text: "Curl Styling Cream nutzen", action: () => { p.looks+=10; addLog("Deine Locken sehen heute extrem gut aus!", "good"); } },
                 { text: "Einfach so lassen", action: () => { p.looks-=5; addLog("Etwas wuschelig heute."); } }
@@ -534,6 +624,7 @@
         {
             icon: "💰", title: "Geld gefunden",
             desc: "Du findest einen 50-Euro-Schein in der Leichendorfer Mühle.",
+            minAge: 6,
             options: [
                 { text: "Einstecken", action: () => { p.money += 50; addLog("Du hast 50 $ behalten!", "good"); } },
                 { text: "Im Fundbüro abgeben", action: () => { p.happy += 15; addLog("Du hast das Geld ehrlich abgegeben.", "good"); } }
@@ -542,16 +633,36 @@
         {
             icon: "✈️", title: "Urlaubserinnerung",
             desc: "Du denkst an den Familienurlaub im Camping Etruria in Italien zurück.",
+            minAge: 4,
             options: [
                 { text: "Fotos anschauen", action: () => { p.happy+=10; addLog("Schöne Erinnerungen an Livorno und Pisa."); } },
                 { text: "Nächsten Trip planen", action: () => { p.smart+=5; addLog("Du planst schon den nächsten Urlaub nach Tokyo!"); } }
+            ]
+        },
+        {
+            icon: "🧸", title: "Erste Schritte",
+            desc: "Du versuchst, alleine zu laufen.",
+            minAge: 0, maxAge: 2,
+            options: [
+                { text: "Losgehen", action: () => { if(Math.random()>0.4){ addLog("Du bist erfolgreich gelaufen! Mama und Papa sind stolz.", "good"); p.happy+=10; } else { addLog("Du bist hingefallen, aber gleich wieder aufgestanden."); p.happy-=2; } } }
+            ]
+        },
+        {
+            icon: "🧑‍🤝‍🧑", title: "Neues Gesicht in der Schule",
+            desc: "In deiner Klasse ist ein neues Kind, das noch niemanden kennt.",
+            minAge: 6, maxAge: 17,
+            options: [
+                { text: "Ansprechen", action: () => { makeFriend(); } },
+                { text: "Ignorieren", action: () => { addLog("Du bleibst lieber für dich."); } }
             ]
         }
     ];
 
     function triggerRandomEvent() {
+        let pool = randomEvents.filter(ev => p.age >= (ev.minAge ?? 0) && p.age <= (ev.maxAge ?? 200));
+        if (pool.length === 0) return;
         if (Math.random() < 0.6) { // 60% Chance pro Jahr für ein Event
-            let ev = randomEvents[Math.floor(Math.random() * randomEvents.length)];
+            let ev = pool[Math.floor(Math.random() * pool.length)];
             showChoice(ev.icon, ev.title, ev.desc, ev.options);
         }
     }
@@ -581,7 +692,7 @@
 
     // --- 4. CORE LOOP: AGE UP ---
     function ageUp() {
-        if (!p.alive) return;
+        if (!p.alive || !p.name) return;
         p.age++;
 
         // Krypto Preise updaten
@@ -604,6 +715,12 @@
         }
 
         // Status-Anpassungen & Bildung
+        if (p.age === 6) {
+            addLog("Du kommst in die Grundschule und lernst dort deine ersten Mitschüler kennen.", "good");
+        }
+        if (p.age === 10) {
+            addLog("Du wechselst aufs Gymnasium Stein.", "good");
+        }
         if (p.age === 18) { 
             p.status = "Erwachsen"; 
             addLog("Du bist jetzt 18 Jahre alt und volljährig! Du hast das Gymnasium abgeschlossen.", "good"); 
@@ -618,6 +735,11 @@
         // Stats degenerieren leicht
         p.happy -= Math.floor(Math.random() * 5);
         p.health -= Math.floor(Math.random() * 5);
+
+        // Zufällige neue Freundschaft in der Schulzeit
+        if (p.age >= 6 && p.age <= 20 && p.friends.length < 6 && Math.random() < 0.25) {
+            makeFriend();
+        }
 
         // Gefängnis Check
         if (p.inJail) {
@@ -658,7 +780,7 @@
 
     // --- 5. HAUPTMENÜ NAVIGATOR ---
     function openView(type) {
-        if (!p.alive) return;
+        if (!p.alive || !p.name) return;
         const modal = document.getElementById('bitlife-modal');
         const title = document.getElementById('bitlife-title');
         const content = document.getElementById('bitlife-content');
@@ -688,10 +810,14 @@
             `;
         } else if (type === 'job') {
             title.innerText = "KARRIERE";
+            if (p.age < 6) {
+                content.innerHTML = `<div style="padding:24px; text-align:center; color:#64748b;">Du bist noch zu jung für Schule oder Arbeit. Genieße erstmal deine Kindheit!</div>`;
+                return;
+            }
             content.innerHTML = `
                 <div class="bitlife-divider">Bildung</div>
-                ${p.age < 18 ? createActItem('🏫', 'Gymnasium Stein', 'Härter lernen', 'studyHard()') : ''}
-                ${p.age >= 18 ? createActItem('🎓', 'Universität', 'Informatik studieren', 'startUni()') : ''}
+                ${p.age < 18 ? createActItem('🏫', getLifeStage(), 'Härter lernen', 'studyHard()') : ''}
+                ${p.age >= 18 ? createActItem('🎓', p.major ? ('Studium: ' + p.major) : 'Universität', p.major ? 'Weiterstudieren' : 'Studienfach wählen', 'startUni()') : ''}
                 
                 <div class="bitlife-divider">Jobs</div>
                 ${p.age >= 18 ? createActItem('💼', 'Jobmarkt', 'Vollzeitjob suchen', 'openJobMarket()') : ''}
@@ -705,9 +831,17 @@
                 content.innerHTML += createActItem('👤', fam.role + ' (' + fam.name + ')', `Beziehung: ${fam.rel}%`, `interactPerson('family', ${idx})`);
             });
             content.innerHTML += `<div class="bitlife-divider">Freunde</div>`;
-            p.friends.forEach((fr, idx) => {
-                content.innerHTML += createActItem('😎', fr.name, `Beziehung: ${fr.rel}%`, `interactPerson('friend', ${idx})`);
-            });
+            if (p.age < 6) {
+                content.innerHTML += `<div style="padding:16px; text-align:center; color:#64748b; font-size:13px;">Du bist noch zu klein für eigene Freunde außerhalb der Familie.</div>`;
+            } else if (p.friends.length === 0) {
+                content.innerHTML += `<div style="padding:16px; text-align:center; color:#64748b; font-size:13px;">Du hast noch keine Freunde gefunden.</div>`;
+                content.innerHTML += createActItem('🙋', 'Leute kennenlernen', 'Neue Freunde finden', 'makeFriend(true)');
+            } else {
+                p.friends.forEach((fr, idx) => {
+                    content.innerHTML += createActItem('😎', fr.name, `Beziehung: ${fr.rel}%`, `interactPerson('friend', ${idx})`);
+                });
+                content.innerHTML += createActItem('🙋', 'Weitere Leute kennenlernen', 'Neue Freunde finden', 'makeFriend(true)');
+            }
             content.innerHTML += `<div class="bitlife-divider">Liebe</div>`;
             if (p.partner) {
                 content.innerHTML += createActItem('❤️', p.partner, 'Dein Partner', 'interactPartner()');
@@ -924,16 +1058,95 @@
 
     // --- 9. JOBS & BILDUNG ---
     function studyHard() { p.smart += 8; addLog("Du hast intensiv für die Schule gelernt.", "good"); closeView(); updateUI(); }
-    
-    function startUni() {
-        if(p.smart > 70) {
-            addLog("Du wurdest für Informatik an der Uni angenommen!", "good");
-            p.smart += 15;
-            p.status = "Student";
-        } else {
-            addLog("Deine Noten waren zu schlecht für die Uni.", "bad");
+
+    // Studiengänge: jeder Studiengang führt später zu passenden, besser bezahlten Jobs
+    const majors = [
+        {
+            key: "informatik", name: "Informatik", icon: "💻", minSmart: 55,
+            jobs: [
+                { title: "Junior Web-Entwickler", salary: 48000 },
+                { title: "Software Engineer", salary: 68000 },
+                { title: "IT-Systemadministrator", salary: 62000 },
+                { title: "Tech Lead", salary: 95000 }
+            ]
+        },
+        {
+            key: "bwl", name: "Betriebswirtschaft (BWL)", icon: "📊", minSmart: 40,
+            jobs: [
+                { title: "Bankkaufmann", salary: 42000 },
+                { title: "Unternehmensberater", salary: 60000 },
+                { title: "Marketing Manager", salary: 55000 },
+                { title: "Geschäftsführer", salary: 110000 }
+            ]
+        },
+        {
+            key: "medizin", name: "Medizin", icon: "🩺", minSmart: 75,
+            jobs: [
+                { title: "Assistenzarzt", salary: 58000 },
+                { title: "Facharzt", salary: 95000 },
+                { title: "Chefarzt", salary: 160000 }
+            ]
+        },
+        {
+            key: "jura", name: "Jura", icon: "⚖️", minSmart: 65,
+            jobs: [
+                { title: "Rechtsanwaltsfachangestellter", salary: 40000 },
+                { title: "Anwalt", salary: 85000 },
+                { title: "Richter", salary: 105000 }
+            ]
+        },
+        {
+            key: "lehramt", name: "Lehramt", icon: "📚", minSmart: 45,
+            jobs: [
+                { title: "Lehrer (Grundschule)", salary: 45000 },
+                { title: "Lehrer (Gymnasium)", salary: 52000 },
+                { title: "Schulleiter", salary: 70000 }
+            ]
+        },
+        {
+            key: "maschinenbau", name: "Maschinenbau", icon: "⚙️", minSmart: 55,
+            jobs: [
+                { title: "Konstrukteur", salary: 50000 },
+                { title: "Ingenieur", salary: 65000 },
+                { title: "Entwicklungsleiter", salary: 90000 }
+            ]
         }
-        closeView(); updateUI();
+    ];
+
+    // Jobs, die keinen Studienabschluss erfordern
+    const genericJobs = [
+        { title: "Verkäufer", salary: 26000 },
+        { title: "Fahrrad-Mechaniker", salary: 30000 },
+        { title: "Lagerarbeiter", salary: 28000 },
+        { title: "Barista", salary: 24000 }
+    ];
+
+    function startUni() {
+        if (p.major) {
+            alert(`Du studierst bereits ${p.major}. Geh zum Jobmarkt, um einen passenden Job zu finden!`);
+            closeView();
+            return;
+        }
+        closeView();
+        let options = majors.map(m => ({
+            text: `${m.icon} ${m.name}`,
+            action: () => chooseMajor(m.key)
+        }));
+        options.push({ text: "Doch nicht studieren", action: () => {} });
+        showChoice("🎓", "STUDIENWAHL", "Was möchtest du studieren? Deine Wahl entscheidet später über deine Job-Möglichkeiten.", options);
+    }
+
+    function chooseMajor(key) {
+        let m = majors.find(x => x.key === key);
+        if (!m) return;
+        if (p.smart < m.minSmart) {
+            addLog(`Du wurdest für ${m.name} abgelehnt - deine Noten waren nicht gut genug.`, "bad");
+            return;
+        }
+        p.major = m.name;
+        p.status = "Student (" + m.name + ")";
+        p.smart += 10;
+        addLog(`Du wurdest für ${m.name} an der Uni angenommen! 🎓`, "good");
     }
 
     function partTimeJob() {
@@ -943,18 +1156,21 @@
     }
 
     function openJobMarket() {
-        let jobs = [
-            { title: "Web-Entwickler (Vercel/JS)", salary: 55000 },
-            { title: "Fahrrad-Mechaniker", salary: 32000 },
-            { title: "IT-Systemadministrator", salary: 65000 },
-            { title: "Bankkaufmann", salary: 45000 }
-        ];
-        
-        let choice = prompt(`Verfügbare Jobs:\n1: ${jobs[0].title} (${jobs[0].salary}$)\n2: ${jobs[1].title} (${jobs[1].salary}$)\n3: ${jobs[2].title} (${jobs[2].salary}$)\n\nWähle 1, 2 oder 3:`);
-        
-        if (choice >= 1 && choice <= 3) {
-            let selected = jobs[choice-1];
-            if (p.smart > 50 || choice == 2) {
+        let matchedJobs = [];
+        if (p.major) {
+            let m = majors.find(x => x.name === p.major);
+            if (m) matchedJobs = m.jobs;
+        }
+        let jobs = matchedJobs.length > 0 ? matchedJobs : genericJobs;
+        let listText = jobs.map((j, i) => `${i+1}: ${j.title} (${j.salary.toLocaleString()}$)`).join("\n");
+        let hint = p.major ? `Mit deinem Abschluss in ${p.major} kannst du dich hier bewerben:` : `Ohne Studienabschluss stehen dir diese Jobs offen (studiere für bessere Chancen!):`;
+        let choice = prompt(`${hint}\n${listText}\n\nWähle eine Nummer:`);
+        let idx = parseInt(choice, 10) - 1;
+
+        if (idx >= 0 && idx < jobs.length) {
+            let selected = jobs[idx];
+            let successChance = p.major ? 0.85 : 0.55;
+            if (Math.random() < successChance) {
                 p.job = selected.title;
                 p.salary = selected.salary;
                 addLog(`Du wurdest als ${selected.title} eingestellt!`, "good");
@@ -973,6 +1189,21 @@
     }
 
     // --- 10. BEZIEHUNGEN ---
+    const possibleFriendNames = ["Tim", "Simon", "Iris", "Lena", "Noah", "Mia", "Ben", "Sophie", "Finn", "Lea", "Paul", "Emma"];
+
+    function makeFriend(fromMenu) {
+        if (p.age < 6) { if (fromMenu) alert("Du bist noch zu klein, um eigene Freunde zu finden!"); return; }
+        let existingNames = p.friends.map(f => f.name);
+        let pool = possibleFriendNames.filter(n => !existingNames.includes(n));
+        if (pool.length === 0) { if (fromMenu) alert("Du kennst schon fast jeden!"); return; }
+        let newName = pool[Math.floor(Math.random() * pool.length)];
+        let rel = Math.floor(Math.random() * 30) + 40;
+        p.friends.push({ name: newName, rel: rel });
+        addLog(`Du hast ${newName} kennengelernt und seid jetzt Freunde!`, "love");
+        if (fromMenu) { closeView(); }
+        updateUI();
+    }
+
     function interactPerson(type, idx) {
         let list = type === 'family' ? p.family : p.friends;
         list[idx].rel += Math.floor(Math.random() * 10) + 2;
@@ -1076,7 +1307,6 @@
     }
 
     // --- INITIALISIERUNG ---
-    addLog(`Du wurdest in ${p.location} geboren. Aktuell bist du ${p.age} Jahre alt.`, "good");
     updateUI();
 </script>
 
