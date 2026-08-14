@@ -127,7 +127,7 @@
         }
         .nav-item:active { opacity: 0.7; }
         .nav-icon { font-size: 22px; margin-bottom: 3px; }
-        
+
         .age-btn-wrapper {
             position: relative;
             z-index: 50;
@@ -375,7 +375,7 @@
             <div class="nav-icon">🏠</div>
             Besitz
         </button>
-        
+
         <div class="age-btn-wrapper">
             <button class="age-btn" onclick="ageUp()">
                 <span class="plus-icon">+</span>
@@ -428,7 +428,7 @@
 
     <!-- SYSTEM SCREENS -->
     <div id="casino-screen" class="system-screen">
-        <button class="system-close" onclick="document.getElementById('casino-screen').style.display='none'">✕</button>
+        <button class="system-close" onclick="closeSystemScreen('casino-screen')">✕</button>
         <h1 style="color:#facc15; font-size:36px; margin-bottom:10px;">🎰 CASINO</h1>
         <p style="margin-bottom:30px;">Setze dein Geld. Doppelt oder nichts!</p>
         <div style="background:#1e293b; padding:20px; border-radius:10px; margin-bottom:20px;">
@@ -458,11 +458,13 @@
             <p id="death-years" style="font-weight:bold; color:white; margin-top:12px;">13 Jahre</p>
             <p id="death-cause" style="font-size:12.5px; margin-top:16px;"></p>
         </div>
-        <button onclick="location.reload()" class="choice-option-btn success" style="max-width:250px;">Neues Leben beginnen</button>
+        <button onclick="startNewLife()" class="choice-option-btn success" style="max-width:250px;">Neues Leben beginnen</button>
     </div>
 </div>
 
 <script>
+    const SAVE_KEY = "bitlife_save_v1";
+
     // --- 1. PLAYER STATE (DATENBANK) ---
     let p = {
         name: "",
@@ -477,7 +479,7 @@
 
         happy: 90, health: 95, smart: 10, looks: 70, fame: 0,
         alive: true, inJail: false, jailYears: 0,
-        
+
         // BEZIEHUNGEN
         family: [
             { role: "Mutter", name: "Mama", rel: 95 },
@@ -486,14 +488,42 @@
         ],
         friends: [],
         partner: null,
-        
+
         // BESITZ & FINANZEN
         possessions: [],
         crypto: { btc: 0, eth: 0 },
         cryptoPrices: { btc: 60000, eth: 3000 },
         socialMedia: { active: false, followers: 0, verified: false },
-        propertiesRented: 0
+        propertiesRented: 0,
+
+        // LOG-VERLAUF (für Speicherstand)
+        logHistory: []
     };
+
+    // --- SAVE / LOAD SYSTEM ---
+    function saveGame() {
+        try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify(p));
+        } catch (e) { /* Speicher voll oder blockiert - ignorieren */ }
+    }
+
+    function loadGame() {
+        try {
+            let raw = localStorage.getItem(SAVE_KEY);
+            if (!raw) return false;
+            let loaded = JSON.parse(raw);
+            if (!loaded || !loaded.name || !loaded.alive) return false;
+            p = loaded;
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function startNewLife() {
+        localStorage.removeItem(SAVE_KEY);
+        location.reload();
+    }
 
     // --- 1B. CHARAKTERERSTELLUNG / GEBURT ---
     function selectGender(g) {
@@ -512,6 +542,7 @@
         p.name = name;
         document.getElementById('birth-screen').style.display = 'none';
         addLog(`${p.name} wurde in ${p.location} geboren! Willkommen auf der Welt.`, "good");
+        saveGame();
         updateUI();
     }
 
@@ -559,6 +590,8 @@
         document.getElementById('bar-smart').style.width = p.smart + "%";
         document.getElementById('bar-looks').style.width = p.looks + "%";
         document.getElementById('bar-fame').style.width = p.fame + "%";
+
+        saveGame();
     }
 
     function addLog(text, type = "normal") {
@@ -567,6 +600,8 @@
     }
 
     function closeView() { document.getElementById('bitlife-modal').style.display = 'none'; }
+
+    function closeSystemScreen(id) { document.getElementById(id).style.display = 'none'; }
 
     function createActItem(icon, title, sub, action) {
         return `
@@ -671,10 +706,10 @@
         document.getElementById('choice-icon').innerText = icon;
         document.getElementById('choice-title').innerText = title;
         document.getElementById('choice-desc').innerText = desc;
-        
+
         let container = document.getElementById('choice-options');
         container.innerHTML = "";
-        
+
         options.forEach(opt => {
             let btn = document.createElement('button');
             btn.className = "choice-option-btn";
@@ -721,9 +756,9 @@
         if (p.age === 10) {
             addLog("Du wechselst aufs Gymnasium Stein.", "good");
         }
-        if (p.age === 18) { 
-            p.status = "Erwachsen"; 
-            addLog("Du bist jetzt 18 Jahre alt und volljährig! Du hast das Gymnasium abgeschlossen.", "good"); 
+        if (p.age === 18) {
+            p.status = "Erwachsen";
+            addLog("Du bist jetzt 18 Jahre alt und volljährig! Du hast das Gymnasium abgeschlossen.", "good");
         }
 
         // Gehalt
@@ -757,7 +792,7 @@
 
         addLog("Ein weiteres Lebensjahr ist vergangen.");
         triggerRandomEvent();
-        
+
         // Tod
         if (p.age > 75) {
             if (Math.random() < (p.age - 70) * 0.05 || p.health <= 0) {
@@ -776,6 +811,7 @@
         document.getElementById('death-years').innerText = p.age + " Jahre alt";
         document.getElementById('death-cause').innerText = "Gestorben: " + reason;
         document.getElementById('death-screen').style.display = 'flex';
+        saveGame();
     }
 
     // --- 5. HAUPTMENÜ NAVIGATOR ---
@@ -791,19 +827,19 @@
             content.innerHTML = `
                 <div class="bitlife-divider">Finanzen</div>
                 ${createActItem('💰', 'Finanzen & Krypto', 'Dein Geld verwalten', 'showCrypto()')}
-                
+
                 <div class="bitlife-divider">Casino</div>
                 ${createActItem('🎰', 'Spielcasino', 'Spiele um Geld', 'openCasino()')}
-                
+
                 <div class="bitlife-divider">Vermieter (Immobilien)</div>
                 ${createActItem('🏢', 'Vermietung', 'Häuser vermieten', 'landlordMenu()')}
-                
+
                 <div class="bitlife-divider">Sammelgegenstände & Inventar</div>
                 ${createActItem('🎒', 'Habseligkeiten', 'Deine Besitztümer ansehen', 'showInventory()')}
-                
+
                 <div class="bitlife-divider">Sonstige</div>
                 ${createActItem('📱', 'Social Media', 'Werde ein Influencer', 'socialMediaMenu()')}
-                
+
                 <div class="bummeln-btn-banner" onclick="openBummelnMenu()">
                     🛍️ Bummeln gehen...
                 </div>
@@ -818,7 +854,7 @@
                 <div class="bitlife-divider">Bildung</div>
                 ${p.age < 18 ? createActItem('🏫', getLifeStage(), 'Härter lernen', 'studyHard()') : ''}
                 ${p.age >= 18 ? createActItem('🎓', p.major ? ('Studium: ' + p.major) : 'Universität', p.major ? 'Weiterstudieren' : 'Studienfach wählen', 'startUni()') : ''}
-                
+
                 <div class="bitlife-divider">Jobs</div>
                 ${p.age >= 18 ? createActItem('💼', 'Jobmarkt', 'Vollzeitjob suchen', 'openJobMarket()') : ''}
                 ${p.age >= 14 ? createActItem('📑', 'Aushilfsjob', 'Taschengeld aufbessern', 'partTimeJob()') : ''}
@@ -855,12 +891,12 @@
                 ${createActItem('🏋️', 'Fitnessstudio', 'Gesundheit verbessern', 'goGym()')}
                 ${createActItem('🏓', 'Tischtennis Verein', 'Training im Verein', 'playTableTennis()')}
                 ${createActItem('🩺', 'Arzt', 'Krankheiten heilen', 'goDoctor()')}
-                
+
                 <div class="bitlife-divider">Hobbies (Zirndorf & PC)</div>
                 ${createActItem('🚲', 'Trailworks Fürth', 'Mountainbike Trails fahren', 'rideBike()')}
                 ${createActItem('🎮', 'Zocken', 'Minecraft & BeamNG', 'playGames()')}
                 ${createActItem('🧪', 'Slime machen', 'DIY Slime mischen', 'makeSlime()')}
-                
+
                 <div class="bitlife-divider">Kriminalität</div>
                 ${createActItem('🥷', 'Taschendiebstahl', 'Leute beklauen', 'crimePickpocket()')}
                 ${createActItem('🚗', 'Autodiebstahl', 'Fahrzeug knacken', 'crimeStealCar()')}
@@ -893,7 +929,7 @@
             <div class="bitlife-divider">Immobilienmakler</div>
             ${createActItem('🏡', 'Faris Khouri Immobilien', 'Einfamilienhäuser', 'openShopCategory("house")')}
             ${createActItem('🏢', 'Asghar & Shammas', 'Gewerbe & Villen', 'openShopCategory("commercial")')}
-            
+
             <div class="bitlife-divider">Spezialhändler</div>
             ${createActItem('✈️', 'Flugzeughandel', 'Privatjets', 'openShopCategory("plane")')}
             ${createActItem('⛵', 'Bootsverkauf', 'Yachten', 'openShopCategory("boat")')}
@@ -943,10 +979,10 @@
     function openShopCategory(catKey) {
         const content = document.getElementById('bitlife-content');
         document.getElementById('bitlife-title').innerText = "ANGEBOTE";
-        
+
         let items = shopData[catKey] || [];
         content.innerHTML = `<div class="bitlife-divider">Verfügbare Artikel</div>`;
-        
+
         if (items.length === 0) return;
 
         items.forEach((item, index) => {
@@ -959,7 +995,7 @@
         if (p.money >= item.price) {
             p.money -= item.price;
             p.possessions.push(item);
-            addLog(`🛒 Du hast **${item.name}** für ${item.price.toLocaleString()} $ gekauft!`, "good");
+            addLog(`🛒 Du hast <strong>${item.name}</strong> für ${item.price.toLocaleString()} $ gekauft!`, "good");
             alert(`Kauf erfolgreich: ${item.name}`);
             closeView();
             updateUI();
@@ -987,7 +1023,7 @@
     function landlordMenu() {
         let houses = p.possessions.filter(i => i.isRealEstate);
         if(houses.length === 0) { alert("Du besitzt keine Immobilien! Kaufe erst welche beim Makler."); return; }
-        
+
         if(confirm(`Du besitzt ${houses.length} Immobilien. Möchtest du sie alle vermieten? (Bringt 15.000$ pro Jahr/Haus)`)) {
             p.propertiesRented = houses.length;
             addLog("Du vermietest nun deine Immobilien!", "good");
@@ -1015,9 +1051,9 @@
     function showCrypto() {
         let btcP = Math.floor(p.cryptoPrices.btc);
         let ethP = Math.floor(p.cryptoPrices.eth);
-        
+
         let msg = `KRYPTO MARKT:\nBitcoin (BTC): ${btcP} $\nEthereum (ETH): ${ethP} $\n\nDein Besitz:\n${p.crypto.btc} BTC\n${p.crypto.eth} ETH\n\nMöchtest du 1 BTC kaufen?`;
-        
+
         if(confirm(msg)) {
             if(p.money >= btcP) {
                 p.money -= btcP;
@@ -1041,7 +1077,7 @@
     function playCasino(amount) {
         if (p.money < amount) { alert("Du hast nicht genug Geld!"); return; }
         p.money -= amount;
-        
+
         // 45% Gewinnchance
         if (Math.random() < 0.45) {
             let win = amount * 2;
@@ -1235,7 +1271,7 @@
     function goGym() { p.health += 10; p.looks += 5; addLog("Gutes Workout im Fitnessstudio!"); closeView(); updateUI(); }
     function playTableTennis() { p.health += 8; p.happy += 10; addLog("Du hast im Tischtennis-Verein trainiert."); closeView(); updateUI(); }
     function goDoctor() { p.health = 100; p.money -= 50; addLog("Der Arzt hat dich komplett durchgecheckt."); closeView(); updateUI(); }
-    
+
     function rideBike() {
         let hasBike = p.possessions.some(i => i.name.includes("Bike") || i.name.includes("Fahrrad"));
         if(!hasBike) { alert("Du brauchst zuerst ein Fahrrad (Geh Bummeln)!"); return; }
@@ -1307,7 +1343,19 @@
     }
 
     // --- INITIALISIERUNG ---
-    updateUI();
+    (function init() {
+        let hasSave = loadGame();
+        if (hasSave) {
+            document.getElementById('birth-screen').style.display = 'none';
+            // Log-Verlauf wiederherstellen
+            const box = document.getElementById('log-box');
+            box.innerHTML = "";
+            (p.logHistory || []).forEach(entry => {
+                box.innerHTML = `<div class="log-entry ${entry.type}"><strong>Alter ${entry.age}:</strong> ${entry.text}</div>` + box.innerHTML;
+            });
+        }
+        updateUI();
+    })();
 </script>
 
 </body>
